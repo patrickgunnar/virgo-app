@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200;300;400;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--root-background-color: #517b4b, #284f22, #091706;
+	--sise-control: 200px; /* control the size */
+	--cube-color-a: #517b4b;
+	--cube-color-b: #091706;
+	--cube-color-c: #284f22;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	height: 100vh;
+	width: 100vw;
+}
+
+body {
+	background: -moz-linear-gradient(var(--root-background-color)) no-repeat fixed;
+	background: -webkit-linear-gradient(var(--root-background-color)) no-repeat fixed;
+	background: -o-linear-gradient(var(--root-background-color)) no-repeat fixed;
+	background: linear-gradient(var(--root-background-color)) no-repeat fixed;
+	background:
+		repeating-conic-gradient(from 30deg, #0000 0 120deg, var(--cube-color-c) 0 180deg) calc(.5 * var(--sise-control)) calc(.5 * var(--sise-control) * 0.577),
+		repeating-conic-gradient(from 30deg, var(--cube-color-a) 0 60deg, var(--cube-color-b) 0 120deg, var(--cube-color-c) 0 180deg);
+	background-size: var(--sise-control) calc(var(--sise-control) * 0.577);
+	font-family: 'Titillium Web', sans-serif;
+}
