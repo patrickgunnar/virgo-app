@@ -16,18 +16,22 @@ const CredentialsTable = () => {
 
     // current layout
     let currentLayout = (
-        <div className="flex flex-col justify-center items-center h-16 w-[50%]">
-            <Button className="flex justify-center items-center p-2 rounded-md font-bold text-base
-            from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-            shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={() => setStep(1)}>
-                Sign in
-            </Button>
-            <Button className="flex justify-center items-center p-2 rounded-md font-bold text-base
-            from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-            shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={() => setStep(2)}>
-                Sign up
-            </Button>
-        </div>
+        <>
+            <div className="flex flex-col justify-center items-center h-16 w-[50%]">
+                <Button className="flex justify-center items-center p-2 rounded-md font-bold text-base
+                from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
+                shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={() => setStep(1)}>
+                    Sign in
+                </Button>
+            </div>
+            <div className="flex flex-col justify-center items-center h-16 w-[50%]">
+                <Button className="flex justify-center items-center p-2 rounded-md font-bold text-base
+                from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
+                shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={() => setStep(2)}>
+                    Sign up
+                </Button>
+            </div>
+        </>
     )
 
     if(step === STEPS.login) currentLayout = (
