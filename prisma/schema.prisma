@@ -14,12 +14,14 @@ model users {
     id             String    @id @default(auto()) @map("_id") @db.ObjectId
     name           String
     email          String   @unique
+    username       String   @unique
     emailVerified  DateTime?
     image          String?
     hashedPassword String
     createdAt      DateTime  @default(now())
     updatedAt      DateTime  @updatedAt
     groupId        String[]
+    bio            String
 }
 
 model groups {
