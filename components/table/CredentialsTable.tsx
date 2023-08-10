@@ -56,6 +56,14 @@ const CredentialsTable = () => {
         else setPasswordType('password')
     }
 
+    // back button handler
+    const handleBackBtn = () => {
+        // reset form
+        reset()
+        // go back
+        setStep(0)
+    }
+
     // button handler
     const CurrentButton = ({eventFn, label}: ButtonType) => (
         <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
@@ -80,7 +88,7 @@ const CredentialsTable = () => {
     // back btn
     const backButton = (
         <div className="flex flex-col justify-start items-center p-4 h-fit w-fit self-start">
-            <CurrentButton label="Back" eventFn={() => setStep(0)} />
+            <CurrentButton label="Back" eventFn={handleBackBtn} />
         </div>
     )
 
