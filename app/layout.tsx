@@ -1,5 +1,6 @@
 import ClientOnly from "@/components/table/ClientOnly";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 
 export const metadata = {
@@ -18,6 +19,7 @@ export default function RootLayout({
         <html lang="en">
             <body className="flex justify-center items-center">
 				<ClientOnly>
+                    <Toaster position="top-center" reverseOrder={false} />
 					{children}
 				</ClientOnly>
 			</body>
