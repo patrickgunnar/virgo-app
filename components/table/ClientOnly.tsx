@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import ClientTable from "./ClientTable";
+import useSession from "@/hooks/useSession";
+import CredentialsTable from "./CredentialsTable";
 
 
 interface ClientOnlyProps {
@@ -12,6 +14,8 @@ interface ClientOnlyProps {
 const ClientOnly: React.FC<ClientOnlyProps> = ({
     children
 }) => {
+    // get session
+    const { session } = useSession()
     // use state to deal with on client state
     const [client, setClient] = useState<boolean>(false)
 
@@ -22,9 +26,13 @@ const ClientOnly: React.FC<ClientOnlyProps> = ({
     // render elements
     return (
         client ? (
-            <ClientTable>
-                {children}
-            </ClientTable>
+            session ? (
+                <ClientTable>
+                    {children}
+                </ClientTable>
+            ) : (
+                <CredentialsTable />
+            )
         ) : (
             <div>
                 Loading...
