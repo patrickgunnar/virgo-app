@@ -29,7 +29,7 @@ const CredentialsTable = () => {
     // step state
     const [stepRegister, setStepRegister] = useState<number>(0)
     // loading state
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false) 
     // password state
     const [passwordType, setPasswordType] = useState<string>('password')
 
