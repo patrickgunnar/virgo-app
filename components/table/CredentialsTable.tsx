@@ -82,6 +82,9 @@ const CredentialsTable = () => {
     // current layout
     let currentLayout = (
         <>
+            <label className="relative truncate text-center text-3xl uppercase font-font-title font-normal mb-20 h-fit w-full">
+                Virgo Chat
+            </label>
             <div className="flex flex-col justify-center items-center h-16 w-[50%]">
                 <CurrentButton label="Sign in" eventFn={() => setStep(1)} />
             </div>

@@ -26,6 +26,9 @@ module.exports = {
           to: { transform: 'rotateZ(360deg)' }
         }
       },
+      fontFamily: {
+        'font-title': ['Poiret One', 'cursive']
+      },
     },
   },
   plugins: [],
