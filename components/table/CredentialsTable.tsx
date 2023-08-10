@@ -35,17 +35,23 @@ const CredentialsTable = () => {
 
     // use form hook
     const {
-        register, handleSubmit, reset, formState: {
+        register, handleSubmit, reset, watch,
+        formState: {
             errors
         }
     } = useForm<FieldValues>({
         defaultValues: {
-            currentEmailData: '',
-            currentPasswordData: '',
-            currentNameData: '',
-            currentUsernameData: ''
+            emailData: '',
+            passwordData: '',
+            nameData: '',
+            usernameData: ''
         }
     })
+
+    const emailData = watch('emailData')
+    const passwordData = watch('passwordData')
+    const nameData = watch('nameData')
+    const usernameData = watch('usernameData')
 
     // submit handler
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {}
@@ -100,20 +106,22 @@ const CredentialsTable = () => {
                 <label className="relative truncate text-center text-base font-bold h-fit w-full">
                     Sign in
                 </label>
-                <Input id="currentEmailData" label="E-mail"
+                <Input id="emailData" label="E-mail"
                     placeholder="Enter your e-mail"
                     register={register}
                     errors={errors}
                     type="text"
                     disabled={isLoading}
+                    value={emailData}
                     required
                 />
-                <Input id="currentPasswordData" label="Password"
+                <Input id="passwordData" label="Password"
                     placeholder="Enter your password"
                     register={register}
                     errors={errors}
                     type={passwordType}
                     disabled={isLoading}
+                    value={passwordData}
                     handleShowPass={handleShowPassword}
                     isPassword
                     required
@@ -130,20 +138,22 @@ const CredentialsTable = () => {
         // current register form step
         let currentRegisterForm = (
             <>
-                <Input id="currentEmailData" label="E-mail"
+                <Input id="emailData" label="E-mail"
                     placeholder="Enter your e-mail"
                     register={register}
                     errors={errors}
-                    type="text"
+                    type="email"
                     disabled={isLoading}
+                    value={emailData}
                     required
                 />
-                <Input id="currentPasswordData" label="Password"
+                <Input id="passwordData" label="Password"
                     placeholder="Enter your password"
                     register={register}
                     errors={errors}
                     type={passwordType}
                     disabled={isLoading}
+                    value={passwordData}
                     handleShowPass={handleShowPassword}
                     isPassword
                     required
@@ -154,27 +164,29 @@ const CredentialsTable = () => {
         // if current step is username
         if(stepRegister === STEPS_REGISTER.USERNAME) currentRegisterForm = (
             <>
-                <Input id="currentNameData" label="Name"
+                <Input id="nameData" label="Name"
                     placeholder="Enter your name"
                     register={register}
                     errors={errors}
                     type="text"
                     disabled={isLoading}
+                    value={nameData}
                     required
                 />
-                <Input id="currentUsernameData" label="Username"
+                <Input id="usernameData" label="Username"
                     placeholder="Enter your username"
                     register={register}
                     errors={errors}
-                    type="pas"
+                    type="text"
                     disabled={isLoading}
+                    value={usernameData}
                     required
                 />
             </>
         )
 
         // current back button handler
-        const currentBackBtn = stepRegister === STEPS_REGISTER.USERNAME ? () => setStepRegister(0) : () => setStep(0)
+        const currentBackBtn = stepRegister === STEPS_REGISTER.USERNAME ? () => setStepRegister(0) : handleBackBtn
         // current button label
         const currentLabelBtn = stepRegister === STEPS_REGISTER.USERNAME ? 'Register' : 'Continue'
         // current handler
