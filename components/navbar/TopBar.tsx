@@ -5,25 +5,21 @@ import Button from "../button/Button";
 import { IoLogOut, IoPersonCircleSharp } from "react-icons/io5";
 import { BsCircleFill } from "react-icons/bs";
 import useStep from "@/hooks/useStep";
-import { useState } from "react";
+import { useSession } from "@/providers/SessionProvider";
+import { UserType } from "@/types";
 
-
-interface UserType {
-    name: string
-    image: string
-    username: string
-    status: string
-}
 
 // top bar
 const TopBar = () => {
+    // get session data
+    const { session } = useSession()
     // step setter hook
     const { setStep, step } = useStep()
 
     // use state to deal with the user data
-    const [user, setUser] = useState<UserType>({
-        name: 'Patrick Gunnar', image: '', username: '@patrickgunnar', status: 'today is the next day...'
-    })
+    const user = {
+        ...session as unknown as UserType
+    }
 
     // image variable
     const image = null
@@ -63,9 +59,9 @@ const TopBar = () => {
                         </div>
                         <div className="relative truncate text-base/4 text-gray-900 font-normal h-fit w-full">
                             <div className="animate-scroll">
-                                {user.status}
-                                {` ${user.status}`}
-                                {` ${user.status}`}
+                                {user.bio}
+                                {` ${user.bio}`}
+                                {` ${user.bio}`}
                             </div>
                         </div>
                     </div>
