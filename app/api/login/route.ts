@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import prisma from "@/components/libs/prismadb";
+import { isValidEmail } from "../helpers";
 
 
 export async function POST(request: Request) {
@@ -23,14 +24,20 @@ export async function POST(request: Request) {
             }
         })
 
-        // if not e-mail
+        // if not user
         if(!user) throw new Error('Invalid data!')
+
+        // check if passwords match
+        const isMacth = await bcrypt.compare(password, user.hashedPassword)
+
+        // if not same password
+        if(!isMacth) throw new Error('Invalid data!')
 
         // jwt secret key
         const secretKey = process.env.JWT_SECRET || ''
         // Generate a JWT token with the user's data
         const token = jwt.sign({
-            email, password, name, username
+            ...user
         }, secretKey, { expiresIn: '1w' })
 
         return NextResponse.json({
