@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import prisma from "@/components/libs/prismadb";
-import { isValidEmail } from "../helpers";
+import { isValidEmail, removeSpecialChar } from "../helpers";
 
 
 export async function POST(request: Request) {
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
             data: {
                 name,
                 email,
-                username,
+                username: removeSpecialChar(username),
                 hashedPassword,
                 image: '',
                 groupId: [],
