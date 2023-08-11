@@ -16,7 +16,7 @@ interface SessionContextProviderProps {
 }
 
 export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ children }) => {
-    const [session, setSession] = useState<any>(null)
+    const [session, setSession] = useState<UserType | any>(null)
 
     // user token handler
     const handleUserToken = () => {
