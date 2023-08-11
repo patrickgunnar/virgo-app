@@ -17,16 +17,17 @@ interface InputProps {
     disabled: boolean
     handleShowPass?: () => void
     isPassword?: boolean
+    labelId?: string
 }
 
 const Input: React.FC<InputProps> = ({
     id, label, placeholder, value, register, 
     errors, type, required, disabled, handleShowPass,
-    isPassword
+    isPassword, labelId
 }) => {
     return (
         <div className="flex flex-col justify-start items-center my-4 h-fit w-full">
-            <label className="flex justify-start items-center py-2 px-4 h-fit w-full">
+            <label id={labelId} className="flex justify-start items-center py-2 px-4 h-fit w-full">
                 {label}
             </label>
             <div className="relative lex justify-start items-center h-fit w-full">
