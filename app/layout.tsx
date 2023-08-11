@@ -1,6 +1,7 @@
 import ClientOnly from "@/components/table/ClientOnly";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { SessionContextProvider } from "@/providers/SessionProvider";
 
 
 export const metadata = {
@@ -16,13 +17,15 @@ export default function RootLayout({
 }) {
 	// render content
     return (
-        <html lang="en">
-            <body className="flex justify-center items-center">
-				<ClientOnly>
-                    <Toaster position="top-center" reverseOrder={false} />
-					{children}
-				</ClientOnly>
-			</body>
-        </html>
+        <SessionContextProvider>
+            <html lang="en">
+                <body className="flex justify-center items-center">
+                    <ClientOnly>
+                        <Toaster position="top-center" reverseOrder={false} />
+                        {children}
+                    </ClientOnly>
+                </body>
+            </html>
+        </SessionContextProvider>
     );
 }
