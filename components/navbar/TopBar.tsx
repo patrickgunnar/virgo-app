@@ -11,8 +11,8 @@ import { UserType } from "@/types";
 
 // top bar
 const TopBar = () => {
-    // get session data
-    const { session } = useSession()
+    // get session data and logout handler
+    const { session, handleLogout } = useSession()
     // step setter hook
     const { setStep, step } = useStep()
 
@@ -68,11 +68,11 @@ const TopBar = () => {
                 </Button>
             </div>
             <div className="flex justify-center items-center h-full mx-2 w-fit max-w-[15%]">
-                <Button className="hidden md:flex justify-center gap-2 hover:opacity-75">
+                <Button className="hidden md:flex justify-center gap-2 hover:opacity-75" onClick={handleLogout}>
                     <IoLogOut size={20} />
                     Sign out
                 </Button>
-                <Button className="flex md:hidden focus:opacity-75">
+                <Button className="flex md:hidden focus:opacity-75" onClick={handleLogout}>
                     <IoLogOut size={20} />
                 </Button>
             </div>
