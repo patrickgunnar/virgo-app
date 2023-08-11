@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import prisma from "@/components/libs/prismadb";
+import { isValidEmail } from "../helpers";
 
 
 export async function POST(request: Request) {
@@ -13,8 +14,12 @@ export async function POST(request: Request) {
 
         // if not expected data
         if(!email || !password || !name || !username) throw new Error('Invalid data!')
+
+        // check email validity
+        const isEmail = isValidEmail(email)
+        
         // if not a valid e-mail
-        if(!isValidEmail(email)) throw new Error('Invalid data!')
+        if(!isEmail) throw new Error('Invalid data!')
 
         // crypting user password
         const hashedPassword = await bcrypt.hash(password, 12)
@@ -34,12 +39,13 @@ export async function POST(request: Request) {
                 bio: 'Welcome to Virgo Chat'
             }
         })
+        console.log(user)
 
         // jwt secret key
         const secretKey = process.env.JWT_SECRET || ''
         // Generate a JWT token with the user's data
         const token = jwt.sign({
-            email, password, name, username
+            ...user
         }, secretKey, { expiresIn: '1w' })
 
         return NextResponse.json({
