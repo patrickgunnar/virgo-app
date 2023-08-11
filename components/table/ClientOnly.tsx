@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ClientTable from "./ClientTable";
-import useSession from "@/hooks/useSession";
 import CredentialsTable from "./CredentialsTable";
+import { useSession } from "@/providers/SessionProvider";
 
 
 interface ClientOnlyProps {
