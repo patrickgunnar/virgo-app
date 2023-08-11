@@ -2,41 +2,43 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "mongodb"
-    url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model users {
-    id             String    @id @default(auto()) @map("_id") @db.ObjectId
-    name           String
-    email          String   @unique
-    username       String   @unique
-    emailVerified  DateTime?
-    image          String?
-    hashedPassword String
-    createdAt      DateTime  @default(now())
-    updatedAt      DateTime  @updatedAt
-    groupId        String[]
-    bio            String
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String     @unique
+  username       String     @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  groupId        String[]
+  bio            String
+  groups         groups[]
+  messages       messages[]
 }
 
 model groups {
-    id            String   @id @default(auto()) @map("_id") @db.ObjectId
-    groupId       String
-    userId        String   @db.ObjectId
-    message       String
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  groupId String
+  userId  String @db.ObjectId
+  message String
 
-    user          users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model messages {
-    id            String   @id @default(auto()) @map("_id") @db.ObjectId
-    userId        String   @db.ObjectId
-    message       String
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String @db.ObjectId
+  message String
 
-    user          users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
