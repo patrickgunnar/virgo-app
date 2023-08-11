@@ -14,6 +14,7 @@ import { useSession } from "@/providers/SessionProvider";
 interface ButtonType {
     eventFn: () => void
     label: string
+    type: "reset" | "submit" | "button" | undefined
 }
 
 enum STEPS {
@@ -109,7 +110,7 @@ const CredentialsTable = () => {
 
             // if current step is login
             if(step === STEPS.LOGIN) {
-                // if dat
+                // if data
                 if(data.emailData && data.passwordData) {
                     // user data
                     const userData = {
@@ -185,10 +186,10 @@ const CredentialsTable = () => {
     }, [usernameData])
 
     // button handler
-    const CurrentButton = ({eventFn, label}: ButtonType) => (
+    const CurrentButton = ({eventFn, label, type}: ButtonType) => (
         <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
         from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={eventFn}>
+        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={eventFn} type={type}>
             {label}
         </Button>
     )
@@ -200,10 +201,10 @@ const CredentialsTable = () => {
                 Virgo Chat
             </label>
             <div className="flex flex-col justify-center items-center h-16 w-[50%]">
-                <CurrentButton label="Sign in" eventFn={() => setStep(1)} />
+                <CurrentButton label="Sign in" eventFn={() => setStep(1)} type="button" />
             </div>
             <div className="flex flex-col justify-center items-center h-16 w-[50%]">
-                <CurrentButton label="Sign up" eventFn={() => setStep(2)} />
+                <CurrentButton label="Sign up" eventFn={() => setStep(2)} type="button" />
             </div>
         </>
     )
@@ -211,7 +212,7 @@ const CredentialsTable = () => {
     // back btn
     const backButton = (
         <div className="flex flex-col justify-start items-center p-4 h-fit w-fit self-start">
-            <CurrentButton label="Back" eventFn={handleBackBtn} />
+            <CurrentButton label="Back" eventFn={handleBackBtn} type="button" />
         </div>
     )
 
@@ -244,7 +245,7 @@ const CredentialsTable = () => {
                     required
                 />
                 <div className="flex justify-center items-center my-4 h-16 w-[40%]">
-                    <CurrentButton label="Login" eventFn={() => {}} />
+                    <CurrentButton label="Login" eventFn={handleSubmit(onSubmit)} type="submit" />
                 </div>
             </div>
         </div>
@@ -309,11 +310,13 @@ const CredentialsTable = () => {
         const currentLabelBtn = stepRegister === STEPS_REGISTER.USERNAME ? 'Register' : 'Continue'
         // current handler
         const currentBtnHandler = stepRegister === STEPS_REGISTER.USERNAME ? handleSubmit(onSubmit) : () => setStepRegister(1)
+        // current button type
+        const currentBtnType = stepRegister === STEPS_REGISTER.USERNAME ? 'submit' : 'button'
 
         currentLayout = (
             <div className="flex flex-col justify-between items-center h-full w-full">
                 <div className="flex flex-col justify-start items-center p-4 h-fit w-fit self-start">
-                    <CurrentButton label="Back" eventFn={currentBackBtn} />
+                    <CurrentButton label="Back" eventFn={currentBackBtn} type="button" />
                 </div>
                 <div className="flex flex-col justify-center items-center h-fit w-[60%]">
                     <label className="relative truncate text-center text-base font-bold h-fit w-full">
@@ -321,7 +324,7 @@ const CredentialsTable = () => {
                     </label>
                     {currentRegisterForm}
                     <div className="flex justify-center items-center my-4 h-16 w-[40%]">
-                        <CurrentButton label={currentLabelBtn} eventFn={currentBtnHandler} />
+                        <CurrentButton label={currentLabelBtn} eventFn={currentBtnHandler} type={currentBtnType} />
                     </div>
                 </div>
             </div>
