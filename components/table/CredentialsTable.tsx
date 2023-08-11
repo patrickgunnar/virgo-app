@@ -1,9 +1,14 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../button/Button";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import Input from "../input/Input";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import Cookies from 'js-cookie';
+import { useRouter } from "next/navigation";
+import { useSession } from "@/providers/SessionProvider";
 
 
 interface ButtonType {
@@ -24,6 +29,10 @@ enum STEPS_REGISTER {
 }
 
 const CredentialsTable = () => {
+    // get router
+    const router = useRouter()
+    // session handler
+    const { handleSession } = useSession()
     // step state
     const [step, setStep] = useState<number>(0)
     // step state
@@ -32,6 +41,9 @@ const CredentialsTable = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false) 
     // password state
     const [passwordType, setPasswordType] = useState<string>('password')
+
+    // interval ref
+    const timeoutRef = useRef<NodeJS.Timer>()
 
     // use form hook
     const {
@@ -54,7 +66,84 @@ const CredentialsTable = () => {
     const usernameData = watch('usernameData')
 
     // submit handler
-    const onSubmit: SubmitHandler<FieldValues> = async (data) => {}
+    const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+        try {
+            setIsLoading(true)
+
+            // if current step is register
+            if(step === STEPS.REGISTER) {
+                // if data
+                if(data.emailData && data.passwordData && 
+                    data.nameData && data.usernameData) {
+                        // user data
+                        const userData = {
+                            email: data.emailData,
+                            password: data.passwordData,
+                            name: data.nameData,
+                            username: data.usernameData
+                        }
+
+                        // send data to the api
+                        axios.post('/api/register/', userData).then((data) => {
+                            if(data.status === 200) {
+                                // set user cookie
+                                Cookies.set('tokenVirgo', data.data.token, { expires: 7, path: '/' })
+                                // set user data
+                                handleSession(data.data.data)
+                                // refresh page
+                                router.refresh()
+                            }
+                        }).catch((error) => {
+                            // display error msg
+                            toast.error('All field are required, try again!')
+                        }).finally(() => {
+                            setIsLoading(false)
+                        })
+
+                    } else {
+                        setIsLoading(false)
+                        // display error msg
+                        toast.error('All field are required, try again!')
+                    }
+            }
+
+            // if current step is login
+            if(step === STEPS.LOGIN) {
+                // if dat
+                if(data.emailData && data.passwordData) {
+                    // user data
+                    const userData = {
+                        email: data.emailData,
+                        password: data.passwordData
+                    }
+
+                    // send data to the api
+                    axios.post('/api/login', userData).then((data) => {
+                        if(data.status === 200) {
+                            // set user cookie
+                            Cookies.set('tokenVirgo', data.data.token, { expires: 7, path: '/' })
+                            // set user data
+                            handleSession(data.data.data)
+                            // refresh page
+                            router.refresh()
+                        }
+                    }).catch((error) => {
+                        // display error msg
+                        toast.error('All field are required, try again!')
+                    }).finally(() => setIsLoading(false))
+
+                } else {
+                    setIsLoading(false)
+                    // display error msg
+                    toast.error('All field are required, try again!')
+                }
+            }
+        } catch (error) {
+            setIsLoading(false)
+            // display error msg
+            toast.error('Something went wrong, try again!')
+        }
+    }
 
     // show/hide password handler
     const handleShowPassword = () => {
@@ -69,6 +158,31 @@ const CredentialsTable = () => {
         // go back
         setStep(0)
     }
+
+    const handleUsernameTimeout = () => {
+        // if there's an interval, clears it
+        if(timeoutRef.current) clearTimeout(timeoutRef.current)
+
+        timeoutRef.current = setTimeout(() => {
+            // check if username exists
+            axios.post('/api/get-username', { usernameData }).then((response) => {
+                // get the available username label
+                const usernameLabel = document.getElementById('availableUsernameLabel')
+
+                // if label, set msg
+                if(usernameLabel) usernameLabel.innerText = response.data.exists ? (
+                        "Username: it's not available, try another one!"
+                    ) : (
+                        "Username: it's available, you can use it!"
+                    )
+            })
+        }, 1000)
+    }
+
+    useEffect(() => {
+        // set interval
+        if(usernameData.length > 0) handleUsernameTimeout()
+    }, [usernameData])
 
     // button handler
     const CurrentButton = ({eventFn, label}: ButtonType) => (
@@ -178,6 +292,7 @@ const CredentialsTable = () => {
                 />
                 <Input id="usernameData" label="Username"
                     placeholder="Enter your username"
+                    labelId="availableUsernameLabel"
                     register={register}
                     errors={errors}
                     type="text"
