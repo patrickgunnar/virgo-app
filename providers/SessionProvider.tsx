@@ -18,29 +18,45 @@ interface SessionContextProviderProps {
     children: React.ReactNode
 }
 
+const useLoadingState = (initialValue: boolean) => {
+    const [loading, setLoading] = useState<boolean>(initialValue)
+
+    return {
+        loading,
+        startLoading: () => setLoading(true),
+        stopLoading: () => setLoading(false),
+    }
+}
+
 export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ children }) => {
     // get router
     const router = useRouter()
 
     const [session, setSession] = useState<UserType | any>(null)
-    const [loading, setIsloading] = useState<boolean | null>(null)
+    const { loading, startLoading, stopLoading } = useLoadingState(true)
 
     // user token handler
     const handleUserToken = async () => {
-        setIsloading(true)
-
         // Set the token as an HttpOnly cookie
         const sessionValue = Cookies.get('tokenVirgo')
 
         if(sessionValue) {
-            const { data } = await axios.post('/api/decode-session', { sessionValue })
+            startLoading()
+            
+            try {
+                const { data } = await axios.post('/api/decode-session', { sessionValue })
 
-            setSession(data?.data || null)
+                setSession(data?.data || null)
+            } catch (error) {
+                console.error("Error decoding session:", error)
+                setSession(null)
+            }
+            
+            stopLoading()
         } else {
             setSession(null)
+            stopLoading()
         }
-
-        setIsloading(false)
     }
 
     // logout handler
@@ -66,7 +82,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         loading: loading,
         handleSession: handleSession,
         handleLogout: handleLogout
-    }), [session])
+    }), [session, loading])
 
     return (
         <SessionContext.Provider value={context}>
