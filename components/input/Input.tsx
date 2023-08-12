@@ -9,7 +9,7 @@ interface InputProps {
     id: string
     label: string
     placeholder: string
-    value: string
+    value?: string
     register: UseFormRegister<FieldValues>
     errors: FieldErrors
     type: string
@@ -38,7 +38,7 @@ const Input: React.FC<InputProps> = ({
                     ) : (
                         'border-black'
                     )} ${isPassword && 'pr-10 md:pr-16'}`}
-                    accept="image/png, image/jpeg"
+                    accept='image/*'
                     placeholder={placeholder}
                     disabled={disabled}
                     required={required}
