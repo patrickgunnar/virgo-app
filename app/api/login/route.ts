@@ -7,46 +7,40 @@ import { isValidEmail } from "../helpers";
 
 export async function POST(request: Request) {
     try {
-        // get the body
-        const body = await request.json()
-        // get user data
-        const { email, password } = body
+        // Parse the request body
+        const { email, password } = await request.json();
 
-        // if not expected data
-        if(!email || !password) throw new Error('Invalid data!')
-        // if not a valid e-mail
-        if(!isValidEmail(email)) throw new Error('Invalid data!')
+        // Validate email and password
+        if (!email || !password || !isValidEmail(email)) {
+            throw new Error("Invalid data!");
+        }
 
-        // check if email exists
-        const user = await prisma.users.findUnique({
+        // Check if the user with the given email exists
+        const user = await prisma.user.findUnique({
             where: {
-                email
-            }
-        })
+                email,
+            },
+        });
 
-        // if not user
-        if(!user) throw new Error('Invalid data!')
+        // If user doesn't exist or password doesn't match, throw an error
+        if (!user || !(await bcrypt.compare(password, user.hashedPassword))) {
+            throw new Error("Invalid data!");
+        }
 
-        // check if passwords match
-        const isMacth = await bcrypt.compare(password, user.hashedPassword)
-
-        // if not same password
-        if(!isMacth) throw new Error('Invalid data!')
-
-        // jwt secret key
-        const secretKey = process.env.JWT_SECRET || ''
         // Generate a JWT token with the user's data
-        const token = jwt.sign({
-            ...user
-        }, secretKey, { expiresIn: '1w' })
+        const secretKey = process.env.JWT_SECRET || "";
+        const token = jwt.sign({ ...user }, secretKey, { expiresIn: "1w" });
 
+        // Return a JSON response with the token and user data
         return NextResponse.json({
-            token: token,
+            token,
             data: user,
-        })
+        });
     } catch (error: any) {
-        return new NextResponse('Internal error!', {
-            status: 500
-        })
+        // Handle errors gracefully
+        console.error("Authentication error:", error);
+        return new NextResponse("Internal error!", {
+            status: 500,
+        });
     }
 }
