@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 const SessionContext = createContext({
     session: null as UserType | null,
+    loading: true as boolean,
     handleSession: () => {},
     handleLogout: () => {}
 })
@@ -22,9 +23,12 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const router = useRouter()
 
     const [session, setSession] = useState<UserType | any>(null)
+    const [loading, setIsloading] = useState<boolean>(true)
 
     // user token handler
     const handleUserToken = async () => {
+        setIsloading(true)
+
         // Set the token as an HttpOnly cookie
         const sessionValue = Cookies.get('tokenVirgo')
 
@@ -35,6 +39,8 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         } else {
             setSession(null)
         }
+
+        setIsloading(false)
     }
 
     // logout handler
@@ -57,6 +63,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     // context
     const context = useMemo(() => ({
         session: session,
+        loading: loading,
         handleSession: handleSession,
         handleLogout: handleLogout
     }), [session])
