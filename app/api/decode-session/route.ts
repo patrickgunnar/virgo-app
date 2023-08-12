@@ -4,22 +4,26 @@ import jwt from "jsonwebtoken";
 
 export async function POST(request: Request) {
     try {
-        // get the body
-        const body = await request.json()
-        // get user data
-        const { sessionValue } = body
+        // Parse the request body
+        const { sessionValue } = await request.json();
 
-        // jwt secret key
-        const secretKey = process.env.JWT_SECRET || ''
-        // decode the token
-        const decodedToken = jwt.verify(sessionValue, secretKey)
+        // Ensure the secret key for JWT is provided
+        const secretKey = process.env.JWT_SECRET || '';
 
+        // Verify the JWT token and decode its contents
+        const decodedToken = jwt.verify(sessionValue, secretKey);
+
+        // Return the decoded data in a JSON response
         return NextResponse.json({
-            data: decodedToken
-        })
+            data: decodedToken,
+        });
     } catch (error: any) {
-        return new NextResponse('Internal error!', {
-            status: 500
-        })
+        // Handle errors gracefully
+        console.error("JWT decoding error:", error);
+
+        // Return an error response with status code 500
+        return new NextResponse("Internal error!", {
+            status: 500,
+        });
     }
 }
