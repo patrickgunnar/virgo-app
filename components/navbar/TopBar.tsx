@@ -4,21 +4,21 @@ import Image from "next/image";
 import Button from "../button/Button";
 import { IoLogOut, IoPersonCircleSharp } from "react-icons/io5";
 import { BsCircleFill } from "react-icons/bs";
-import useStep from "@/hooks/useStep";
 import { useSession } from "@/providers/SessionProvider";
 import { UserType } from "@/types";
+import { useRouter } from "next/navigation";
 
 
 // top bar
 const TopBar = () => {
+    // get router
+    const router = useRouter()
     // get session data and logout handler
     const { session, handleLogout } = useSession()
-    // step setter hook
-    const { setStep, step } = useStep()
 
     // use state to deal with the user data
     const user = {
-        ...session as unknown as UserType
+        ...session as UserType
     }
 
     // image variable
@@ -30,7 +30,7 @@ const TopBar = () => {
         via-[#a94e41] to-[#882314] bg-gradient-to-b px-2 min-h-fit">
             <div className="flex justify-start items-center h-full w-[80%] md:w-[30%]">
                 <Button className="justify-start hover:opacity-75"
-                onClick={() => setStep(2)}>
+                onClick={() => router.push('/settings')}>
                     {
                         image ? (
                             <div className="flex h-[85%] aspect-square rounded-full drop-shadow-[0_0_0.05rem] 
