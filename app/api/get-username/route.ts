@@ -3,31 +3,41 @@ import prisma from "@/components/libs/prismadb";
 import { removeSpecialChar } from "../helpers";
 
 
+async function checkUsernameExists(username: string): Promise<boolean> {
+    if (!username) {
+        return false // Empty username, consider it as not existing
+    }
+
+    const formattedUsername = removeSpecialChar(username)
+
+    const user = await prisma.user.findUnique({
+        where: {
+            username: formattedUsername,
+        },
+    })
+
+    return Boolean(user)
+}
+
 export async function POST(request: Request) {
     try {
-        // Parse the request body
-        const body = await request.json();
-        // Get user data
-        const { usernameData } = body;
-        // Format username
-        const username = removeSpecialChar(usernameData);
+        const body = await request.json()
+        const { usernameData } = body
 
-        // Check if the username exists
-        const user = await prisma.user.findUnique({
-            where: {
-                username,
-            },
-        });
+        if (!usernameData || typeof usernameData !== "string") {
+            throw new Error("Invalid username format.")
+        }
 
-        // Return a JSON response indicating whether the username exists
+        const usernameExists = await checkUsernameExists(usernameData)
+
         return NextResponse.json({
-            exists: Boolean(user !== null),
-        });
+            exists: usernameExists,
+        })
     } catch (error: any) {
-        // Handle errors gracefully
-        console.error("Error in POST request:", error);
+        console.error("Error in POST request:", error)
+
         return new NextResponse("Internal error!", {
             status: 500,
-        });
+        })
     }
 }
