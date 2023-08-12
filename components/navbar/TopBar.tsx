@@ -43,7 +43,7 @@ const TopBar = () => {
                         )
                     }
                     <div className="flex flex-col justify-center items-center text-left h-fit w-[70%]">
-                        <div className="relative truncate text-lg/3 font-bold h-fit w-full">
+                        <div className="relative truncate text-lg/3 font-bold  py-1 h-fit w-full">
                             {user.name}
                             <span className="inline-block mx-2 my-[2px]">
                                 <BsCircleFill size={5} />
@@ -52,7 +52,7 @@ const TopBar = () => {
                                 {user.username}
                             </span>
                         </div>
-                        <div className="relative truncate text-base/4 text-gray-900 font-normal h-fit w-full">
+                        <div className="relative truncate text-base/4 text-gray-900 font-normal py-1 h-fit w-full">
                             <div className="animate-marquee">
                                 {user.bio}
                             </div>
