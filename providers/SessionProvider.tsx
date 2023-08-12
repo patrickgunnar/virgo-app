@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 const SessionContext = createContext({
     session: null,
-    handleSession: (data: UserType | null) => {},
+    handleSession: () => {},
     handleLogout: () => {}
 })
 
@@ -38,24 +38,22 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         }
     }
 
-    useEffect(() => {
-        handleUserToken()
-    }, [])
-
-    // set session
-    const handleSession = (data: UserType | null) => {
-        setSession(data)
-    }
-
     // logout handler
     const handleLogout = () => {
         // remove cookies
         Cookies.remove('tokenVirgo', { expires: 7, path: '/' })
         // set user data
-        handleSession(null)
+        setSession(null)
         // refresh page
         router.refresh()
     }
+
+    useEffect(() => {
+        handleUserToken()
+    }, [])
+
+    // set session
+    const handleSession = () => handleUserToken()
 
     // context
     const context = {
