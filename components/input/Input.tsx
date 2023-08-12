@@ -30,7 +30,7 @@ const Input: React.FC<InputProps> = ({
             <label id={labelId} className="flex justify-start items-center py-2 px-4 h-fit w-full">
                 {label}
             </label>
-            <div className="relative lex justify-start items-center h-fit w-full">
+            <div className="relative flex justify-start items-center h-fit w-full">
                 <input className={`flex justify-start items-center p-2 rounded-md h-fit w-full border-[1px]
                 ${errors[id] ? (
                     'border-red-600'
@@ -44,22 +44,22 @@ const Input: React.FC<InputProps> = ({
                     value={value}
                     {...register(id, { required })}
                 />
+                {
+                    isPassword && (
+                        <div className="absolute flex justify-center items-center aspect-square h-6 right-[5%]">
+                            <Button className="flex justify-center items-center" onClick={handleShowPass}>
+                                {
+                                    type === 'text' ? (
+                                        <BiSolidHide size={20} />
+                                    ) : (
+                                        <BiSolidShow size={20} />
+                                    )
+                                }
+                            </Button>
+                        </div>
+                    )
+                }
             </div>
-            {
-                isPassword && (
-                    <div className="absolute flex justify-center items-center aspect-square h-6 top-[65.6%] left-[74.8%]">
-                        <Button className="flex justify-center items-center" onClick={handleShowPass}>
-                            {
-                                type === 'text' ? (
-                                    <BiSolidHide size={20} />
-                                ) : (
-                                    <BiSolidShow size={20} />
-                                )
-                            }
-                        </Button>
-                    </div>
-                )
-            }
         </div>
     );
 }
