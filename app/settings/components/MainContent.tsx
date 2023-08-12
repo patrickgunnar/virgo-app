@@ -245,6 +245,9 @@ const MainContent = () => {
                     toast.error('Required filed, try again!')
                 }
             }
+
+            // reset form
+            reset()
         } catch (error) {
             setIsLoading(false)
             // display error msg
