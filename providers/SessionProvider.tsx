@@ -24,15 +24,15 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const [session, setSession] = useState<UserType | any>(null)
 
     // user token handler
-    const handleUserToken = () => {
+    const handleUserToken = async () => {
         // Set the token as an HttpOnly cookie
         const sessionValue = Cookies.get('tokenVirgo')
 
         if(sessionValue) {
-            axios.post('/api/decode-session', { sessionValue }).then((response) => {
-                // set data
-                setSession(response.data.data)
-            })
+            const { data } = await axios.post('/api/decode-session', { sessionValue })
+
+            // set data
+            setSession(data.data)
         } else {
             setSession(null)
         }
@@ -53,7 +53,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     }, [])
 
     // set session
-    const handleSession = () => handleUserToken()
+    const handleSession = async () => await handleUserToken()
 
     // context
     const context = {

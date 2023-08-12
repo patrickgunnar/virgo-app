@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
         // Generate a JWT token with the user's data
         const secretKey = process.env.JWT_SECRET || "";
-        const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1w" });
+        const token = jwt.sign({ ...user }, secretKey, { expiresIn: "1w" });
 
         // Return a JSON response with the token
         return NextResponse.json({
