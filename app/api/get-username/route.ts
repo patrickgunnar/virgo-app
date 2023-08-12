@@ -1,26 +1,33 @@
 import { NextResponse } from "next/server";
 import prisma from "@/components/libs/prismadb";
+import { removeSpecialChar } from "../helpers";
 
 
 export async function POST(request: Request) {
     try {
-        // get the body
-        const body = await request.json()
-        // get user data
-        const { usernameData } = body
-        // format username
-        const username = `${usernameData}`.replaceAll('@', '')
+        // Parse the request body
+        const body = await request.json();
+        // Get user data
+        const { usernameData } = body;
+        // Format username
+        const username = removeSpecialChar(usernameData);
 
-        const user = await prisma.users.findUnique({
+        // Check if the username exists
+        const user = await prisma.user.findUnique({
             where: {
-                username
-            }
-        })
+                username,
+            },
+        });
 
+        // Return a JSON response indicating whether the username exists
         return NextResponse.json({
-            exists: Boolean(user !== null)
-        })
+            exists: Boolean(user !== null),
+        });
     } catch (error: any) {
-        return 
+        // Handle errors gracefully
+        console.error("Error in POST request:", error);
+        return new NextResponse("Internal error!", {
+            status: 500,
+        });
     }
 }
