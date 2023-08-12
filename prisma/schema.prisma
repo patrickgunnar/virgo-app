@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,35 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+model User {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  email          String     @unique
-  username       String     @unique
+  email          String             @unique
+  username       String             @unique
   emailVerified  DateTime?
   image          String?
   hashedPassword String
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  groupId        String[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
   bio            String
-  groups         groups[]
-  messages       messages[]
+  groupMemberships GroupMembership[] @relation("UserToGroupMembership")
+  messages       Message[]          @relation("UserToMessage")
 }
 
-model groups {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
+model Group {
+  id      String             @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  members GroupMembership[]  @relation("GroupMembershipToGroup")
+  messages Message[]        @relation("GroupToMessage")
+}
+
+model GroupMembership {
+  id      String             @id @default(auto()) @map("_id") @db.ObjectId
   groupId String
-  userId  String @db.ObjectId
-  message String
-
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User               @relation("UserToGroupMembership", fields: [userId], references: [id])
+  group   Group              @relation("GroupMembershipToGroup", fields: [groupId], references: [id])
 }
 
-model messages {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  userId  String @db.ObjectId
-  message String
-
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Message {
+  id         String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String             @db.ObjectId
+  message    String
+  created_at DateTime           @default(now())
+  user       User               @relation("UserToMessage", fields: [userId], references: [id])
+  group      Group              @relation("GroupToMessage", fields: [groupId], references: [id])
+  groupId    String             @db.ObjectId
 }
