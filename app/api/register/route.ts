@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import prisma from "@/components/libs/prismadb";
 import { isValidEmail, removeSpecialChar } from "../helpers";
 
+
 async function createUser(data: {
     name: string;
     email: string;
