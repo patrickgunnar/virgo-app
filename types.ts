@@ -8,5 +8,6 @@ export interface UserType {
     groupId: string[]
     username: string
     bio: string
+    tokenVirgo: string
 }
 
