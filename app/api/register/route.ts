@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
-import bcrypt from "bcrypt"
 import prisma from "@/components/libs/prismadb"
-import { isValidEmail, removeSpecialChar } from "../helpers"
+import { hashPassword, isValidEmail, removeSpecialChar } from "../helpers"
 
-
-async function hashPassword(password: string): Promise<string> {
-    const saltRounds = 12
-    return bcrypt.hash(password, saltRounds)
-}
 
 async function createUser(data: {
     name: string
