@@ -327,7 +327,7 @@ const CredentialsTable = () => {
                         Sign up
                     </label>
                     {currentRegisterForm}
-                    <div className="flex justify-center items-center my-4 h-16 w-[40%]">
+                    <div className="flex justify-center items-center px-4 my-4 h-16 w-fit">
                         <CurrentButton label={currentLabelBtn} eventFn={currentBtnHandler} type={currentBtnType} />
                     </div>
                 </div>
@@ -336,10 +336,12 @@ const CredentialsTable = () => {
     }
 
     return (
-        <main className="flex flex-col justify-center items-center gap-4 h-[70%] w-[90%] lg:h-[50%] lg:w-[40%] 
+        <main className="flex flex-col justify-center items-center gap-4 h-[70%] w-[90%] lg:h-[55%] lg:w-[40%] 
         rounded-md from-[#c77d29] via-[#c66f22] to-[#ae5817] bg-gradient-to-b border-[#c66f22]
         border-[1px] drop-shadow-[0_0_0.5rem] shadow-[rgba(0,0,0,0.57)] overflow-hidden">
-            {currentLayout}
+            <div className="flex flex-col justify-center items-center gap-4 h-[98%] w-[98%] overflow-hidden overflow-y-auto">
+                {currentLayout}
+            </div>
         </main>
     );
 }
