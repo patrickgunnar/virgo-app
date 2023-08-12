@@ -1,9 +1,14 @@
-import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import prisma from "@/components/libs/prismadb";
-import { isValidEmail, removeSpecialChar } from "../helpers";
+import { NextResponse } from "next/server"
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
+import prisma from "@/components/libs/prismadb"
+import { isValidEmail, removeSpecialChar } from "../helpers"
 
+
+async function hashPassword(password: string): Promise<string> {
+    const saltRounds = 12
+    return bcrypt.hash(password, saltRounds)
+}
 
 async function createUser(data: {
     name: string
@@ -20,9 +25,12 @@ async function createUser(data: {
 
         const validUsername = removeSpecialChar(username)
 
-        const existingUserWithUsername = await prisma.user.findFirst({ where: { username: validUsername } })
-        if(existingUserWithUsername) {
-            throw new Error('Username on use!')
+        const existingUserWithUsername = await prisma.user.findFirst({
+            where: { username: validUsername },
+        })
+
+        if (existingUserWithUsername) {
+            throw new Error("Username in use!")
         }
 
         const isEmailValid = isValidEmail(email)
@@ -32,10 +40,10 @@ async function createUser(data: {
 
         const existingUserWithEmail = await prisma.user.findFirst({ where: { email } })
         if (existingUserWithEmail) {
-            throw new Error("E-mail on use!")
+            throw new Error("Email in use!")
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12)
+        const hashedPassword = await hashPassword(password)
         if (!hashedPassword) {
             throw new Error("Something went wrong!")
         }
@@ -48,24 +56,24 @@ async function createUser(data: {
                 hashedPassword,
                 image: "",
                 bio: "Welcome to Virgo Chat",
-                tokenVirgo: ""
+                tokenVirgo: "",
             },
         })
 
-        if(!user) {
+        if (!user) {
             throw new Error("Something went wrong!")
         }
 
         const secretKey = process.env.JWT_SECRET || ""
         const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1w" })
 
-        const updateData = await prisma.user.update({
+        await prisma.user.update({
             where: {
-                id: user.id
+                id: user.id,
             },
             data: {
-                tokenVirgo: token
-            }
+                tokenVirgo: token,
+            },
         })
 
         return { token }
@@ -89,8 +97,9 @@ export async function POST(request: Request) {
         return NextResponse.json(token)
     } catch (error: any) {
         console.error("POST request error:", error)
+        
         return new NextResponse("Internal error!", {
-            status: 500
+            status: 500,
         })
     }
 }
