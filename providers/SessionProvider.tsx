@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 const SessionContext = createContext({
     session: null as UserType | null,
-    loading: true as boolean,
+    loading: null as boolean | null,
     handleSession: () => {},
     handleLogout: () => {}
 })
@@ -23,7 +23,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const router = useRouter()
 
     const [session, setSession] = useState<UserType | any>(null)
-    const [loading, setIsloading] = useState<boolean>(true)
+    const [loading, setIsloading] = useState<boolean | null>(null)
 
     // user token handler
     const handleUserToken = async () => {
