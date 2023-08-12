@@ -14,7 +14,8 @@ module.exports = {
       },
       animation: {
         scroll: 'scroll 4s linear infinite',
-        rotate: 'rotate 8s linear infinite'
+        rotate: 'rotate 8s linear infinite',
+        marquee: 'marqueeAnimation 20s linear infinite'
       },
       keyframes: {
         scroll: {
@@ -24,6 +25,10 @@ module.exports = {
         rotate: {
           from: { transform: 'rotateZ(0deg)' },
           to: { transform: 'rotateZ(360deg)' }
+        },
+        marqueeAnimation: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(-100%)' }
         }
       },
       fontFamily: {
