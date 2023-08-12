@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import prisma from "@/components/libs/prismadb";
 import { isValidEmail } from "../helpers";
 
+
 const JWT_SECRET = process.env.JWT_SECRET || ""
 
 class AuthenticationError extends Error {
