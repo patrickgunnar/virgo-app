@@ -90,7 +90,7 @@ const CredentialsTable = () => {
                                 // set user cookie
                                 Cookies.set('tokenVirgo', data.data.token, { expires: 7, path: '/' })
                                 // set user data
-                                handleSession(data.data.data)
+                                handleSession()
                                 // refresh page
                                 router.refresh()
                                 // display success msg
@@ -98,7 +98,7 @@ const CredentialsTable = () => {
                             }
                         }).catch((error) => {
                             // display error msg
-                            toast.error('All field are required or e-mail is already on use, try again!')
+                            toast.error('E-mail or username is already on use, try again!')
                         }).finally(() => {
                             setIsLoading(false)
                         })
@@ -126,7 +126,7 @@ const CredentialsTable = () => {
                             // set user cookie
                             Cookies.set('tokenVirgo', data.data.token, { expires: 7, path: '/' })
                             // set user data
-                            handleSession(data.data.data)
+                            handleSession()
                             // refresh page
                             router.refresh()
                             // display success msg
@@ -134,7 +134,7 @@ const CredentialsTable = () => {
                         }
                     }).catch((error) => {
                         // display error msg
-                        toast.error('All field are required, try again!')
+                        toast.error('Check e-mail/password, try again!')
                     }).finally(() => setIsLoading(false))
 
                 } else {
