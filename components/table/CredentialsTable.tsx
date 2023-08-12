@@ -93,10 +93,12 @@ const CredentialsTable = () => {
                                 handleSession(data.data.data)
                                 // refresh page
                                 router.refresh()
+                                // display success msg
+                                toast.success('Registred!')
                             }
                         }).catch((error) => {
                             // display error msg
-                            toast.error('All field are required, try again!')
+                            toast.error('All field are required or e-mail is already on use, try again!')
                         }).finally(() => {
                             setIsLoading(false)
                         })
@@ -127,6 +129,8 @@ const CredentialsTable = () => {
                             handleSession(data.data.data)
                             // refresh page
                             router.refresh()
+                            // display success msg
+                            toast.success('Logged in!')
                         }
                     }).catch((error) => {
                         // display error msg
