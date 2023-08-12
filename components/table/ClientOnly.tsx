@@ -22,7 +22,6 @@ const ClientOnly: React.FC<ClientOnlyProps> = ({
     // deal with the client only state
     // set client to true when on client side
     useEffect(() => setClient(true), [])
-    console.log(loading)
 
     // current layout
     const currentLayout = !session ? <CredentialsTable /> : <ClientTable>{children}</ClientTable>
