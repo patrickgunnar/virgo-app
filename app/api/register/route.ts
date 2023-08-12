@@ -6,16 +6,16 @@ import { isValidEmail, removeSpecialChar } from "../helpers";
 
 
 async function createUser(data: {
-    name: string;
-    email: string;
-    password: string;
-    username: string;
-}): Promise<{ token: string; data: any } | null> {
+    name: string
+    email: string
+    password: string
+    username: string
+}): Promise<{ token: string } | null> {
     try {
-        const { name, email, password, username } = data;
+        const { name, email, password, username } = data
 
         if (!email || !password || !name || !username) {
-            throw new Error("Invalid data!");
+            throw new Error("Invalid data!")
         }
 
         const validUsername = removeSpecialChar(username)
@@ -25,19 +25,19 @@ async function createUser(data: {
             throw new Error('Username on use!')
         }
 
-        const isEmailValid = isValidEmail(email);
+        const isEmailValid = isValidEmail(email)
         if (!isEmailValid) {
-            throw new Error("Invalid email!");
+            throw new Error("Invalid email!")
         }
 
         const existingUserWithEmail = await prisma.user.findFirst({ where: { email } })
         if (existingUserWithEmail) {
-            throw new Error("E-mail on use!");
+            throw new Error("E-mail on use!")
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        const hashedPassword = await bcrypt.hash(password, 12)
         if (!hashedPassword) {
-            throw new Error("Something went wrong!");
+            throw new Error("Something went wrong!")
         }
 
         const user = await prisma.user.create({
@@ -48,35 +48,49 @@ async function createUser(data: {
                 hashedPassword,
                 image: "",
                 bio: "Welcome to Virgo Chat",
+                tokenVirgo: ""
             },
-        });
+        })
 
-        const secretKey = process.env.JWT_SECRET || "";
-        const token = jwt.sign({ ...user }, secretKey, { expiresIn: "1w" });
+        if(!user) {
+            throw new Error("Something went wrong!")
+        }
 
-        return { token, data: user };
+        const secretKey = process.env.JWT_SECRET || ""
+        const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1w" })
+
+        const updateData = await prisma.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                tokenVirgo: token
+            }
+        })
+
+        return { token }
     } catch (error: any) {
-        console.error("User registration error:", error);
-        return null;
+        console.error("User registration error:", error)
+        return null
     }
 }
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const user = await createUser(body);
+        const body = await request.json()
+        const token = await createUser(body)
 
-        if (!user) {
+        if (!token) {
             return new NextResponse("Internal error!", {
                 status: 500,
-            });
+            })
         }
 
-        return NextResponse.json(user);
+        return NextResponse.json(token)
     } catch (error: any) {
-        console.error("POST request error:", error);
+        console.error("POST request error:", error)
         return new NextResponse("Internal error!", {
             status: 500
-        });
+        })
     }
 }
