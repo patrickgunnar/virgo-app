@@ -1,14 +1,14 @@
 'use client'
 
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import Cookies from 'js-cookie';
 import { UserType } from "@/types";
 import { useRouter } from "next/navigation";
 
 
 const SessionContext = createContext({
-    session: null,
+    session: null as UserType | null,
     handleSession: () => {},
     handleLogout: () => {}
 })
@@ -31,8 +31,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         if(sessionValue) {
             const { data } = await axios.post('/api/decode-session', { sessionValue })
 
-            // set data
-            setSession(data.data)
+            setSession(data?.data || null)
         } else {
             setSession(null)
         }
@@ -56,11 +55,11 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const handleSession = async () => await handleUserToken()
 
     // context
-    const context = {
+    const context = useMemo(() => ({
         session: session,
         handleSession: handleSession,
         handleLogout: handleLogout
-    }
+    }), [session])
 
     return (
         <SessionContext.Provider value={context}>
