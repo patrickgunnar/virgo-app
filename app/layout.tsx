@@ -21,9 +21,9 @@ export default function RootLayout({
             <html lang="en">
                 <body className="flex justify-center items-center">
                     <ClientOnly>
-                        <Toaster position="top-center" reverseOrder={false} />
                         {children}
                     </ClientOnly>
+                    <Toaster position="top-center" reverseOrder={false} />
                 </body>
             </html>
         </SessionContextProvider>
