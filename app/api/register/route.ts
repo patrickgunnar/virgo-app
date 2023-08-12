@@ -18,7 +18,9 @@ async function createUser(data: {
             throw new Error("Invalid data!");
         }
 
-        const existingUserWithUsername = await prisma.user.findFirst({ where: { username } })
+        const validUsername = removeSpecialChar(username)
+
+        const existingUserWithUsername = await prisma.user.findFirst({ where: { username: validUsername } })
         if(existingUserWithUsername) {
             throw new Error('Username on use!')
         }
@@ -42,7 +44,7 @@ async function createUser(data: {
             data: {
                 name,
                 email,
-                username: removeSpecialChar(username),
+                username: validUsername,
                 hashedPassword,
                 image: "",
                 bio: "Welcome to Virgo Chat",
