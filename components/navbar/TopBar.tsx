@@ -17,12 +17,7 @@ const TopBar = () => {
     const { session, handleLogout } = useSession()
 
     // use state to deal with the user data
-    const user = {
-        ...session as UserType
-    }
-
-    // image variable
-    const image = null
+    const user = { ...session as UserType }
 
     // render components
     return (
@@ -32,9 +27,9 @@ const TopBar = () => {
                 <Button className="justify-start hover:opacity-75"
                 onClick={() => router.push('/settings')}>
                     {
-                        image ? (
-                            <div className="flex h-[85%] aspect-square rounded-full drop-shadow-[0_0_0.05rem] 
-                            shadow-[#00000080] border-[#737373] border-[1px] overflow-hidden">
+                        user.image ? (
+                            <div className="flex h-[80%] aspect-square rounded-full drop-shadow-[0_0_0.05rem] 
+                            shadow-[#00000080] border-[#481811] border-[1px] overflow-hidden ml-2">
                                 <Image className="object-cover"
                                     src={user.image}
                                     alt={user.name}
@@ -42,7 +37,7 @@ const TopBar = () => {
                                 />
                             </div>
                         ) : (
-                            <div className="flex h-[85%] aspect-square overflow-hidden">
+                            <div className="flex h-[80%] aspect-square overflow-hidden ml-2">
                                 <IoPersonCircleSharp className="h-full w-full" />
                             </div>
                         )
@@ -58,10 +53,8 @@ const TopBar = () => {
                             </span>
                         </div>
                         <div className="relative truncate text-base/4 text-gray-900 font-normal h-fit w-full">
-                            <div className="animate-scroll">
+                            <div className="animate-marquee">
                                 {user.bio}
-                                {` ${user.bio}`}
-                                {` ${user.bio}`}
                             </div>
                         </div>
                     </div>
