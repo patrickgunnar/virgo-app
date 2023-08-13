@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/components/libs/prismadb";
 import jwt from "jsonwebtoken";
-import { io } from "socket.io-client";
+import Pusher from "pusher";
 
 
 interface DecodedType {
@@ -10,8 +10,14 @@ interface DecodedType {
     exp: number
 }
 
-const appServerUrl = process.env.CURRENT_APP_URL || "http://localhost:4000"
-const socket = io(appServerUrl)
+// Initialize Pusher
+const pusher = new Pusher({
+    appId: process.env.PUSHER_APP_ID || "",
+    key: process.env.PUSHER_KEY || "",
+    secret: process.env.PUSHER_SECRET || "",
+    cluster: process.env.PUSHER_CLUSTER || "",
+    useTLS: true,
+})
 
 export async function POST(request: Request) {
     try {
@@ -19,8 +25,8 @@ export async function POST(request: Request) {
         const { token, userId, message } = body
 
         if (
-            !token || typeof token !== "string" || 
-            !userId || typeof userId !== "string" || 
+            !token || typeof token !== "string" ||
+            !userId || typeof userId !== "string" ||
             !message || typeof message !== "string"
         ) {
             throw new Error("Invalid token, id or message format.")
@@ -33,7 +39,7 @@ export async function POST(request: Request) {
         // Check if the token is still valid
         const tokenValid = Date.now() < decodeToken.exp * 1000
 
-        if(tokenValid) {
+        if (tokenValid) {
             // get sender user
             const sender = await prisma.user.findUnique({
                 where: {
@@ -48,7 +54,7 @@ export async function POST(request: Request) {
                 }
             })
 
-            if(sender && sender.tokenVirgo === token && receiver) {
+            if (sender && sender.tokenVirgo === token && receiver) {
                 const newMessage = await prisma.message.create({
                     data: {
                         message: message,
@@ -58,10 +64,9 @@ export async function POST(request: Request) {
                     }
                 })
 
-                if(newMessage) {
-                    // Emit the new message to connected clients
-                    socket.emit('newMessage', newMessage);
-                    
+                if (newMessage) {
+                    pusher.trigger('chat', 'new-message', newMessage)
+
                     // Return the user data in a JSON response
                     return NextResponse.json({ data: newMessage })
                 }
