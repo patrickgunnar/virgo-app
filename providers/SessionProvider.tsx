@@ -3,12 +3,14 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import Cookies from 'js-cookie';
-import { UserType } from "@/types";
+import { MessageType, UserType } from "@/types";
 import { useRouter } from "next/navigation";
+import Pusher from "pusher-js";
 
 
 const SessionContext = createContext({
     session: null as UserType | null,
+    messages: null as MessageType[] | null,
     loading: null as boolean | null,
     handleSession: () => {},
     handleLogout: () => {}
@@ -32,7 +34,8 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     // get router
     const router = useRouter()
 
-    const [session, setSession] = useState<UserType | any>(null)
+    const [session, setSession] = useState<UserType | null>(null)
+    const [messages, setMessages] = useState<MessageType[] | null>(null)
     const { loading, startLoading, stopLoading } = useLoadingState(true)
 
     // user token handler
@@ -73,12 +76,44 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         handleUserToken()
     }, [])
 
+    useEffect(() => {
+        if(session) {
+            const pusherKey = process.env.PUSHER_KEY || ""
+            const pusherCluster = process.env.PUSHER_CLUSTER || ""
+
+            // Initialize Pusher with your Pusher app key
+            const pusher = new Pusher(pusherKey, {
+                cluster: pusherCluster
+            })
+
+            // Subscribe to the "chat" channel
+            const channel = pusher.subscribe('chat')
+
+            // Listen for the "new-message" event
+            channel.bind('new-message', (data: MessageType) => {
+                if(data.receiverId === session.id || data.senderId === session.id) {
+                    // Add the new message to the messages state
+                    const prevMessages = messages ? [...messages, data] : [data]
+
+                    setMessages(prevMessages)
+                }
+            })
+
+            // Clean up the Pusher subscription when the component unmounts
+            return () => {
+                pusher.unsubscribe('chat')
+                pusher.disconnect()
+            }
+        }
+    }, [session])
+
     // set session
     const handleSession = async () => await handleUserToken()
 
     // context
     const context = useMemo(() => ({
         session: session,
+        messages: messages,
         loading: loading,
         handleSession: handleSession,
         handleLogout: handleLogout
