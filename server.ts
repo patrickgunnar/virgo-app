@@ -1,15 +1,21 @@
-import { createServer } from "https"
+import { createServer } from "http"
 import { Server, Socket } from "socket.io"
-import { readFileSync } from "fs"
+//import { readFileSync } from "fs"
 
 
 // Load the SSL certificate and private key
-const serverOpt = {
-    key: readFileSync('server.key'),
-    cert: readFileSync('server.cert')
-}
+//const serverOpt = {
+//    key: readFileSync('server.key'),
+//    cert: readFileSync('server.cert')
+//}
+//
+//const server = createServer(serverOpt, (req, res) => {
+//    // Handle HTTP requests
+//    res.writeHead(200)
+//    res.end('Hello, HTTPS!')
+//})
 
-const server = createServer(serverOpt, (req, res) => {
+const server = createServer((req, res) => {
     // Handle HTTP requests
     res.writeHead(200)
     res.end('Hello, HTTPS!')

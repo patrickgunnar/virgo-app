@@ -1,14 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var https_1 = require("https");
+var http_1 = require("http");
 var socket_io_1 = require("socket.io");
-var fs_1 = require("fs");
+//import { readFileSync } from "fs"
 // Load the SSL certificate and private key
-var serverOpt = {
-    key: (0, fs_1.readFileSync)('server.key'),
-    cert: (0, fs_1.readFileSync)('server.cert')
-};
-var server = (0, https_1.createServer)(serverOpt, function (req, res) {
+//const serverOpt = {
+//    key: readFileSync('server.key'),
+//    cert: readFileSync('server.cert')
+//}
+//
+//const server = createServer(serverOpt, (req, res) => {
+//    // Handle HTTP requests
+//    res.writeHead(200)
+//    res.end('Hello, HTTPS!')
+//})
+var server = (0, http_1.createServer)(function (req, res) {
     // Handle HTTP requests
     res.writeHead(200);
     res.end('Hello, HTTPS!');
