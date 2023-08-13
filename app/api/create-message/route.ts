@@ -60,7 +60,7 @@ export async function POST(request: Request) {
                         message: message,
                         senderId: sender.id,
                         receiverId: receiver.id,
-                        groupId: `${sender.id}${receiver.id}`
+                        groupId: sender.id
                     }
                 })
 
