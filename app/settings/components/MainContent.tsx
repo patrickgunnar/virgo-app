@@ -279,7 +279,7 @@ const MainContent = () => {
                 )
             })
         }, 1000)
-    }, [])
+    }, [profileUsername])
 
     // convert image to base64
     const handleBase64Convertion = async (file: File, name: string) => {

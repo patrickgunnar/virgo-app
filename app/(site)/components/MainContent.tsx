@@ -136,7 +136,7 @@ const MainContent = () => {
                 }
             })
         }, 1000)
-    }, [])
+    }, [addingNewUser])
 
     // new message handler
     const handleNewMessage = async () => {

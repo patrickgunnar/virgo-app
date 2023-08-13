@@ -182,7 +182,7 @@ const CredentialsTable = () => {
                     )
             })
         }, 1000)
-    }, [])
+    }, [usernameData])
 
     useEffect(() => {
         // set interval
