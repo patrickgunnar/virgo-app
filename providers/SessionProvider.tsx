@@ -42,7 +42,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const handleMessagesData = async (userToken: string) => {
         try {
             if(userToken) {
-                const { data } = await axios.post('', { token: userToken })
+                const { data } = await axios.post('/api/get-messages/', { token: userToken })
     
                 setMessages(data?.data || null)
             }
