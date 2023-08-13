@@ -192,7 +192,7 @@ const MainContent = () => {
                 <div className="flex flex-col-reverse h-[82%] w-full">
                     {
                         messages?.map(item => (
-                            <div>
+                            <div key={item.id}>
                                 {item.message}
                             </div>
                         ))
