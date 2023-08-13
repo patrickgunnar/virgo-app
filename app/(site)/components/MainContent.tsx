@@ -26,7 +26,7 @@ enum STEPS {
 
 const MainContent = () => {
     // get session data and logout handler
-    const { session } = useSession()
+    const { session, messages } = useSession()
     // get router
     const router = useRouter()
     // modal hook
@@ -117,7 +117,6 @@ const MainContent = () => {
     const handleUsernameTimeout = () => {
         // if there's an interval, clears it
         if(timeoutRef.current) clearTimeout(timeoutRef.current)
-        console.log(addingNewUser)
 
         timeoutRef.current = setTimeout(() => {
             // check if username exists
@@ -189,9 +188,15 @@ const MainContent = () => {
     if(step === STEPS.CHATBOX) currentLayout = (
         <>
             {backButton}
-            <div className="flex flex-col justify-between items-center h-[87%] w-[80%]">
+            <div className="flex flex-col justify-between items-center h-[87%] w-[80%] overflow-hidden">
                 <div className="flex flex-col-reverse h-[82%] w-full">
-                    {addingNewUser}
+                    {
+                        messages?.map(item => (
+                            <div>
+                                {item.message}
+                            </div>
+                        ))
+                    }
                 </div>
                 <div className="flex justify-between items-center h-[15%] w-[50%]">
                     <div className="flex justify-center items-center h-full w-[85%]">
