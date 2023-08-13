@@ -11,3 +11,11 @@ export interface UserType {
     tokenVirgo: string
 }
 
+export interface MessageType {
+    id: string
+    senderId: string
+    receiverId: string
+    message: string
+    created_at: string
+}
+
