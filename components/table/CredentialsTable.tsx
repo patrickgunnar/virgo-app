@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "../button/Button";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import Input from "../input/Input";
@@ -164,7 +164,7 @@ const CredentialsTable = () => {
         setStep(0)
     }
 
-    const handleUsernameTimeout = () => {
+    const handleUsernameTimeout = useCallback(() => {
         // if there's an interval, clears it
         if(timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -182,12 +182,12 @@ const CredentialsTable = () => {
                     )
             })
         }, 1000)
-    }
+    }, [])
 
     useEffect(() => {
         // set interval
         if(usernameData.length > 0) handleUsernameTimeout()
-    }, [usernameData])
+    }, [usernameData, handleUsernameTimeout])
 
     // button handler
     const CurrentButton = ({eventFn, label, type}: ButtonType) => (

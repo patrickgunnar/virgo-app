@@ -5,7 +5,7 @@ import Input from "@/components/input/Input"
 import { useSession } from "@/providers/SessionProvider"
 import { UserType } from "@/types"
 import Image from "next/image"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { BsCircleFill } from "react-icons/bs"
 import { IoPersonCircleSharp } from "react-icons/io5"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
@@ -261,7 +261,7 @@ const MainContent = () => {
         else setPasswordType('password')
     }
 
-    const handleUsernameTimeout = () => {
+    const handleUsernameTimeout = useCallback(() => {
         // if there's an interval, clears it
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -279,7 +279,7 @@ const MainContent = () => {
                 )
             })
         }, 1000)
-    }
+    }, [])
 
     // convert image to base64
     const handleBase64Convertion = async (file: File, name: string) => {
@@ -303,7 +303,7 @@ const MainContent = () => {
         // set interval
         if (profileUsername.length > 0) handleUsernameTimeout()
         if(profileImage) handleBase64Convertion(profileImage[0], profileImage[0].name)
-    }, [profileUsername, profileImage])
+    }, [profileUsername, profileImage, handleUsernameTimeout])
 
     // current layout
     let currentLayout = (

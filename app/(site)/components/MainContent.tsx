@@ -4,7 +4,7 @@ import Button from "@/components/button/Button";
 import Input from "@/components/input/Input";
 import Modal from "@/components/modal/Modal";
 import useModal from "@/hooks/useModal";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BsPlusCircleFill, BsFillSendFill } from "react-icons/bs";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { toast } from "react-hot-toast";
@@ -114,7 +114,7 @@ const MainContent = () => {
         reset()
     }
 
-    const handleUsernameTimeout = () => {
+    const handleUsernameTimeout = useCallback(() => {
         // if there's an interval, clears it
         if(timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -136,7 +136,7 @@ const MainContent = () => {
                 }
             })
         }, 1000)
-    }
+    }, [])
 
     // new message handler
     const handleNewMessage = async () => {
@@ -153,7 +153,7 @@ const MainContent = () => {
     useEffect(() => {
         // set interval
         if(addingNewUser.length > 0) handleUsernameTimeout()
-    }, [addingNewUser])
+    }, [addingNewUser, handleUsernameTimeout])
 
     // button handler
     const CurrentButton = ({eventFn, children, type}: ButtonType) => (
