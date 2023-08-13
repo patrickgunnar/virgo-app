@@ -38,6 +38,19 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const [messages, setMessages] = useState<MessageType[] | null>(null)
     const { loading, startLoading, stopLoading } = useLoadingState(true)
 
+    // retrieve user's messages
+    const handleMessagesData = async (userToken: string) => {
+        try {
+            if(userToken) {
+                const { data } = await axios.post('', { token: userToken })
+    
+                setMessages(data?.data || null)
+            }
+        } catch (error) {
+            console.error("Error fetching messages:", error)
+        }
+    }
+
     // user token handler
     const handleUserToken = async () => {
         // Set the token as an HttpOnly cookie
@@ -49,9 +62,12 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
             try {
                 const { data } = await axios.post('/api/decode-session', { sessionValue })
 
+                if(data.data) await handleMessagesData(sessionValue)
+
                 setSession(data?.data || null)
             } catch (error) {
                 console.error("Error decoding session:", error)
+
                 setSession(null)
             }
             
