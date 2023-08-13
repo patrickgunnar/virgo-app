@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/components/libs/prismadb";
 import jwt from "jsonwebtoken";
-import Pusher from "pusher";
+import { pusher } from "@/components/libs/pusher";
 
 
 interface DecodedType {
@@ -9,15 +9,6 @@ interface DecodedType {
     iat: number
     exp: number
 }
-
-// Initialize Pusher
-const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID || "",
-    key: process.env.PUSHER_KEY || "",
-    secret: process.env.PUSHER_SECRET || "",
-    cluster: process.env.PUSHER_CLUSTER || "",
-    useTLS: true,
-})
 
 export async function POST(request: Request) {
     try {
