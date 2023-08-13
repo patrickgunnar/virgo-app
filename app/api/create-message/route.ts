@@ -22,11 +22,11 @@ const pusher = new Pusher({
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { token, userId, message } = body
+        const { token, message, username } = body
 
         if (
             !token || typeof token !== "string" ||
-            !userId || typeof userId !== "string" ||
+            !username || typeof username !== "string" ||
             !message || typeof message !== "string"
         ) {
             throw new Error("Invalid token, id or message format.")
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
             // get receiver user
             const receiver = await prisma.user.findUnique({
                 where: {
-                    id: userId
+                    username
                 }
             })
 
