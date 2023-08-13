@@ -1,19 +1,19 @@
 'use client'
 
 import axios from "axios";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Cookies from 'js-cookie';
 import { MessageType, UserType } from "@/types";
 import { useRouter } from "next/navigation";
-import Pusher from "pusher-js";
+import PusherClient from "pusher-js";
 
 
 const SessionContext = createContext({
     session: null as UserType | null,
-    messages: null as MessageType[] | null,
-    loading: null as boolean | null,
-    handleSession: () => {},
-    handleLogout: () => {}
+    messages: [] as MessageType[],
+    loading: true,
+    handleSession: () => { },
+    handleLogout: () => { }
 })
 
 interface SessionContextProviderProps {
@@ -35,15 +35,18 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const router = useRouter()
 
     const [session, setSession] = useState<UserType | null>(null)
-    const [messages, setMessages] = useState<MessageType[] | null>(null)
+    const [messages, setMessages] = useState<MessageType[]>([])
     const { loading, startLoading, stopLoading } = useLoadingState(true)
+
+    // pusher ref
+    const pusherRef = useRef<any>(null)
 
     // retrieve user's messages
     const handleMessagesData = async (userToken: string) => {
         try {
-            if(userToken) {
+            if (userToken) {
                 const { data } = await axios.post('/api/get-messages/', { token: userToken })
-    
+
                 setMessages(data?.data || null)
             }
         } catch (error) {
@@ -56,13 +59,13 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         // Set the token as an HttpOnly cookie
         const sessionValue = Cookies.get('tokenVirgo')
 
-        if(sessionValue) {
+        if (sessionValue) {
             startLoading()
-            
+
             try {
                 const { data } = await axios.post('/api/decode-session', { sessionValue })
 
-                if(data.data) await handleMessagesData(sessionValue)
+                if (data.data) await handleMessagesData(sessionValue)
 
                 setSession(data?.data || null)
             } catch (error) {
@@ -70,7 +73,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
 
                 setSession(null)
             }
-            
+
             stopLoading()
         } else {
             setSession(null)
@@ -93,35 +96,52 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     }, [])
 
     useEffect(() => {
-        if(session) {
-            const pusherKey = process.env.PUSHER_KEY || ""
-            const pusherCluster = process.env.PUSHER_CLUSTER || ""
-
-            // Initialize Pusher with your Pusher app key
-            const pusher = new Pusher(pusherKey, {
-                cluster: pusherCluster
-            })
-
-            // Subscribe to the "chat" channel
-            const channel = pusher.subscribe('chat')
-
-            // Listen for the "new-message" event
-            channel.bind('new-message', (data: MessageType) => {
-                if(data.receiverId === session.id || data.senderId === session.id) {
-                    // Add the new message to the messages state
-                    const prevMessages = messages ? [...messages, data] : [data]
-
-                    setMessages(prevMessages)
+        // Function to fetch Pusher configuration
+        const fetchPusherConfig = async () => {
+            if (session) {
+                try {
+                    // Fetch Pusher configuration from the API
+                    const { pusherKey, pusherCluster } = (await axios.get('/api/config')).data
+    
+                    // Create a new Pusher instance
+                    const pusherInstance = new PusherClient(pusherKey, {
+                        cluster: pusherCluster,
+                        encrypted: true
+                    })
+    
+                    // Subscribe to the "chat" channel
+                    const channel = pusherInstance.subscribe('chat')
+    
+                    // Listen for the "new-message" event
+                    channel.bind('new-message', (data: MessageType) => {
+                        // Check if the message involves the current user
+                        if (data.receiverId === session.id || data.senderId === session.id) {
+                            // Add the new message to the messages state
+                            setMessages(prevMessages => [data, ...prevMessages ])
+                        }
+                    })
+    
+                    // Store the Pusher instance in a ref
+                    pusherRef.current = pusherInstance;
+                } catch (error) {
+                    console.error("Error fetching Pusher configuration:", error)
                 }
-            })
-
-            // Clean up the Pusher subscription when the component unmounts
-            return () => {
-                pusher.unsubscribe('chat')
-                pusher.disconnect()
+            }
+        }
+    
+        // Fetch Pusher configuration when the component mounts
+        if (typeof window !== "undefined") {
+            fetchPusherConfig()
+        }
+    
+        // Clean up the Pusher subscription when the component unmounts
+        return () => {
+            if (pusherRef.current) {
+                pusherRef.current.disconnect()
             }
         }
     }, [session])
+    
 
     // set session
     const handleSession = async () => await handleUserToken()
@@ -133,7 +153,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         loading: loading,
         handleSession: handleSession,
         handleLogout: handleLogout
-    }), [session, loading])
+    }), [session, loading, messages])
 
     return (
         <SessionContext.Provider value={context}>
