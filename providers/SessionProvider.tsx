@@ -117,7 +117,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                         // Check if the message involves the current user
                         if (data.receiverId === session.id || data.senderId === session.id) {
                             // Add the new message to the messages state
-                            setMessages(prevMessages => [data, ...prevMessages ])
+                            setMessages(prevMessages => [ ...prevMessages, data ])
                         }
                     })
     
