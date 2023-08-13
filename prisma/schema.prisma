@@ -20,7 +20,8 @@ model User {
   updatedAt      DateTime           @updatedAt
   bio            String
   groupMemberships GroupMembership[] @relation("UserToGroupMembership")
-  messages       Message[]          @relation("UserToMessage")
+  sentMessages   Message[]          @relation("SentMessages")
+  receivedMessages Message[]        @relation("ReceivedMessages")
 }
 
 model Group {
@@ -39,11 +40,13 @@ model GroupMembership {
 }
 
 model Message {
-  id         String             @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String             @db.ObjectId
-  message    String
-  created_at DateTime           @default(now())
-  user       User               @relation("UserToMessage", fields: [userId], references: [id])
-  group      Group              @relation("GroupToMessage", fields: [groupId], references: [id])
-  groupId    String             @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  senderId    String     @db.ObjectId
+  receiverId  String     @db.ObjectId
+  message     String
+  created_at  DateTime   @default(now())
+  sender      User       @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User       @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  group       Group      @relation("GroupToMessage", fields: [groupId], references: [id])
+  groupId     String     @db.ObjectId
 }
