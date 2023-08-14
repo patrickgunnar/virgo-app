@@ -5,6 +5,12 @@ import prisma from "@/components/libs/prismadb";
 import { isValidEmail } from "../helpers";
 
 
+interface DecodedType {
+    userId: string
+    iat: number
+    exp: number
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || ""
 
 class AuthenticationError extends Error {
@@ -48,12 +54,25 @@ export async function POST(request: Request) {
             throw new AuthenticationError("Invalid email or password.")
         }
 
-        const token = await generateToken(user.id)
-        await updateTokenForUser(user.id, token)
+        // Verify the JWT token and decode its contents
+        const decoded = jwt.verify(user.tokenVirgo, JWT_SECRET) as DecodedType
+        // Check if the token is still valid
+        const tokenValid = Date.now() < decoded.exp * 1000
 
-        return NextResponse.json({
-            token
-        })
+        // check if db token stills valid, return the db token
+        // if token not valid, create a new one
+        if (tokenValid && decoded.userId === user.id) {
+            return NextResponse.json({
+                token: user.tokenVirgo
+            })
+        } else {
+            const token = await generateToken(user.id)
+            await updateTokenForUser(user.id, token)
+
+            return NextResponse.json({
+                token
+            })
+        }
     } catch (error: any) {
         console.error("Authentication error:", error.message)
 
