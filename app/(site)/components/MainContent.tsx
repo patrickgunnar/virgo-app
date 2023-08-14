@@ -203,7 +203,7 @@ const MainContent = () => {
     // current layout 
     let currentLayout = (
         <>
-            <div className="flex flex-col justify-center items-center my-2 mb-4 h-fit w-[20%]">
+            <div className="flex flex-col justify-center items-center my-2 mb-4 h-fit w-[40%] md:w-[20%]">
                 <CurrentButton type="button" eventFn={() => onOpen()}>
                     <BsPlusCircleFill size={25} />
                 </CurrentButton>
@@ -231,7 +231,7 @@ const MainContent = () => {
                                     </div>
                                 )
                             }
-                            <div className="flex flex-col justify-center items-start text-left h-full w-[93%]">
+                            <div className="flex flex-col justify-center items-start text-left h-full w-[65%] md:w-[93%]">
                                 <div className="relative truncate text-lg text-black font-bold h-fit w-full">
                                     {item.name}
                                     <span className="inline-block mx-2 my-[2px]">
@@ -293,8 +293,8 @@ const MainContent = () => {
                             })
                         }
                     </div>
-                    <div className="flex justify-between items-center h-[15%] w-[50%]">
-                        <div className="flex justify-center items-center h-full w-[85%]">
+                    <div className="flex gap-2 justify-between items-center mb-2 md:mb-0 h-[15%] w-full lg:w-[50%]">
+                        <div className="flex justify-center items-center h-full w-[70%] md:w-[85%]">
                             <Input id="addingNewMessage"
                                 placeholder="Send message..."
                                 type="text"
@@ -329,7 +329,8 @@ const MainContent = () => {
 
     // render content
     return (
-        <div className="relative flex gap-2 flex-col justify-start items-center h-[98%] w-[98%] overflow-hidden overflow-y-auto">
+        <div className="relative flex gap-2 flex-col justify-start items-center h-[87%] md:h-[98%] w-[98%] 
+        self-start overflow-hidden overflow-y-auto">
             {currentLayout}
             <Modal open={open} onChange={handleModalClose}>
                 <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[40%] rounded-md

@@ -42,7 +42,7 @@ const TopBar = () => {
                             </div>
                         )
                     }
-                    <div className="flex flex-col justify-center items-center text-left h-fit w-[70%]">
+                    <div className="flex flex-col justify-center items-center text-left h-fit w-[65%] md:w-[70%]">
                         <div className="relative truncate text-lg/3 font-bold  py-1 h-fit w-full">
                             {user.name}
                             <span className="inline-block mx-2 my-[2px]">
