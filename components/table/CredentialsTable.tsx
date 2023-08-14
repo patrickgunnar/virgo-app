@@ -43,6 +43,8 @@ const CredentialsTable = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false) 
     // password state
     const [passwordType, setPasswordType] = useState<string>('password')
+    // username input state
+    const [usernameInput, setUsernameInput] = useState<boolean>(false)
 
     // interval ref
     const timeoutRef = useRef<NodeJS.Timer>()
@@ -74,6 +76,7 @@ const CredentialsTable = () => {
 
             // if current step is register
             if(step === STEPS.REGISTER) {
+                setUsernameInput(true)
                 // if data
                 if(data.emailData && data.passwordData && 
                     data.nameData && data.usernameData) {
@@ -102,10 +105,12 @@ const CredentialsTable = () => {
                             toast.error('E-mail or username is already on use, try again!')
                         }).finally(() => {
                             setIsLoading(false)
+                            setUsernameInput(false)
                         })
 
                     } else {
                         setIsLoading(false)
+                        setUsernameInput(false)
                         // display error msg
                         toast.error('All field are required, try again!')
                     }
@@ -307,7 +312,7 @@ const CredentialsTable = () => {
                     register={register}
                     errors={errors}
                     type="text"
-                    disabled={isLoading}
+                    disabled={usernameInput}
                     value={usernameData}
                     required
                 />

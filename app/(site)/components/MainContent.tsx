@@ -37,7 +37,7 @@ const MainContent = () => {
     const [step, setStep] = useState<number>(0)
     // loading state
     const [loading, setLoading] = useState<boolean>(false)
-    // username stae
+    // username state
     const [isUsername, setIsUsername] = useState<boolean>(false)
 
     // interval ref
@@ -256,7 +256,7 @@ const MainContent = () => {
                             type="text"
                             register={register}
                             errors={errors}
-                            disabled={loading}
+                            disabled={false}
                             value={addingNewUser}
                             required
                         />

@@ -43,6 +43,8 @@ const MainContent = () => {
     const [passwordType, setPasswordType] = useState<string>('password')
     // image base64
     const [imageBase64, setImageBase64] = useState<string | null>(null)
+    // username input state
+    const [usernameInput, setUsernameInput] = useState<boolean>(false)
 
     // interval ref
     const timeoutRef = useRef<NodeJS.Timer>()
@@ -189,6 +191,8 @@ const MainContent = () => {
 
             // if current step is username
             if (step === 5) {
+                setUsernameInput(true)
+
                 // if data
                 if (data.profileUsername) {
                     // send data to the api
@@ -208,10 +212,12 @@ const MainContent = () => {
                         toast.error('Something went wrong, try again!')
                     }).finally(() => {
                         setIsLoading(false)
+                        setUsernameInput(false)
                     })
 
                 } else {
                     setIsLoading(false)
+                    setUsernameInput(false)
                     // display error msg
                     toast.error('Required filed, try again!')
                 }
@@ -495,7 +501,7 @@ const MainContent = () => {
                     register={register}
                     required
                     value={profileUsername}
-                    disabled={isLoading}
+                    disabled={usernameInput}
                     labelId="profileUsernameLabel"
                 />
                 {submitBtn}
