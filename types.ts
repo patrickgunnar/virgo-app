@@ -19,3 +19,9 @@ export interface MessageType {
     created_at: string
 }
 
+export interface ChatType {
+    username: string
+    name: string
+    chat: MessageType[]
+}
+
