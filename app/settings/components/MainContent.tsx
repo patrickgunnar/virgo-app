@@ -263,6 +263,8 @@ const MainContent = () => {
     }
 
     const handleUsernameTimeout = useCallback(() => {
+        setIsLoading(true)
+        
         // if there's an interval, clears it
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -278,7 +280,7 @@ const MainContent = () => {
                 ) : (
                     "Username: it's available, you can use it!"
                 )
-            })
+            }).finally(() => setIsLoading(false))
         }, 1000)
     }, [profileUsername])
 
