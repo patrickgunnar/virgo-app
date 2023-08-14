@@ -15,14 +15,15 @@ const getChats = (userId: string | null | undefined, messages: MessageType[]) =>
             if(!usedIds.includes(currentUser)) {
                 usedIds.push(currentUser)
 
-                const { name, username } = await (await axios.post('/api/get-user/', { userId })).data
+                const { name, username, image } = await (await axios.post('/api/get-user/', { userId })).data
                 const tempArray = messages.filter(content => (
                     content.receiverId === currentUser ||
                     content.senderId === currentUser
                 ))
                 chats.push({
-                    name: name,
-                    username: username,
+                    name,
+                    username,
+                    image,
                     chat: tempArray
                 })
             }

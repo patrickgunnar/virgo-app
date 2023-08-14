@@ -22,6 +22,7 @@ export interface MessageType {
 export interface ChatType {
     username: string
     name: string
+    image: string
     chat: MessageType[]
 }
 
