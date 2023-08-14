@@ -265,7 +265,8 @@ const MainContent = () => {
             <>
                 {backButton}
                 <div className="flex flex-col justify-between items-center h-[87%] w-[80%] overflow-hidden">
-                    <div className="flex flex-col-reverse h-[82%] w-full overflow-hidden overflow-y-auto no-scrollbar">
+                    <div className="flex flex-col-reverse justify-start items-start h-[82%] w-full 
+                    overflow-hidden overflow-y-auto no-scrollbar">
                         {
                             currentChat.chat.map(item => {
                                 const currentName = session.id === item.senderId ? session.name : currentChat.name
@@ -278,6 +279,7 @@ const MainContent = () => {
                                         username={currentUsername}
                                         image={currentImage}
                                         message={item}
+                                        isCurrentUser={session.id === item.senderId}
                                     />
                                 )
                             })
@@ -299,8 +301,8 @@ const MainContent = () => {
                         </div>
                         <div className="flex justify-center items-center h-[95%] aspect-square">
                             <Button className="flex justify-center items-center from-[#d76752] rounded-full
-                        via-[#a94e41] to-[#882314] bg-gradient-to-t drop-shadow-[0_1.4px_0.05rem] 
-                        shadow-[#00000092] border-[#d76752] border-[1px] hover:opacity-75" type="submit"
+                            via-[#a94e41] to-[#882314] bg-gradient-to-t drop-shadow-[0_1.4px_0.05rem] 
+                            shadow-[#00000092] border-[#d76752] border-[1px] hover:opacity-75" type="submit"
                                 onClick={handleSubmit(onSubmit)} disabled={loading}>
                                 {
                                     !loading ? (
