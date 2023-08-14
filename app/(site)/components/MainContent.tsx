@@ -12,6 +12,8 @@ import axios from "axios";
 import { useSession } from "@/providers/SessionProvider";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/button/loading/Loading";
+import Image from "next/image";
+import { IoPersonCircleSharp } from "react-icons/io5";
 
 
 interface ButtonType {
@@ -27,7 +29,7 @@ enum STEPS {
 
 const MainContent = () => {
     // get session data and logout handler
-    const { session, messages } = useSession()
+    const { session, chats } = useSession()
     // get router
     const router = useRouter()
     // modal hook
@@ -173,11 +175,46 @@ const MainContent = () => {
     // current layout 
     let currentLayout = (
         <>
-            <div className="flex justify-center items-center my-2 h-fit w-[20%]">
+            <div className="flex flex-col justify-center items-center my-2 h-fit w-[20%]">
                 <CurrentButton type="button" eventFn={() => onOpen()}>
                     <BsPlusCircleFill size={25} />
                 </CurrentButton>
             </div>
+            {
+                chats.map(item => (
+                    <div className="flex flex-col gap-2 justify-start items-center h-5 w-full bg-blue-800"
+                    key={item.chat[0].id}>
+                        {
+                            item.image ? (
+                                <div className="flex h-[80%] aspect-square rounded-full drop-shadow-[0_0_0.05rem] 
+                                shadow-[#00000080] border-[#481811] border-[1px] overflow-hidden ml-2">
+                                    <Image className="object-cover"
+                                        src={item.image}
+                                        alt={item.name}
+                                        fill
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex h-[80%] aspect-square overflow-hidden ml-2">
+                                    <IoPersonCircleSharp className="h-full w-full" />
+                                </div>
+                            )
+                        }
+                        <div>
+                            <div>
+                                {
+                                    item.name + '-' + item.username
+                                }
+                            </div>
+                            <div>
+                                {
+                                    item.chat[0].message
+                                }
+                            </div>
+                        </div>
+                    </div>
+                ))
+            }
         </>
     )
 
@@ -197,7 +234,7 @@ const MainContent = () => {
             <div className="flex flex-col justify-between items-center h-[87%] w-[80%] overflow-hidden">
                 <div className="flex flex-col-reverse h-[82%] w-full">
                     {
-                        messages?.map(item => (
+                        chats[0].chat.map(item => (
                             <div key={item.id}>
                                 {item.message}
                             </div>
