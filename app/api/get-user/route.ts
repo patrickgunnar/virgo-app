@@ -21,7 +21,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             username: user.username,
-            name: user.name
+            name: user.name,
+            image: user.image
         })
     } catch (error: any) {
         console.error("Error in POST request:", error)
