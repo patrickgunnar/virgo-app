@@ -5,7 +5,7 @@ import Input from "@/components/input/Input";
 import Modal from "@/components/modal/Modal";
 import useModal from "@/hooks/useModal";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BsPlusCircleFill, BsFillSendFill } from "react-icons/bs";
+import { BsPlusCircleFill, BsFillSendFill, BsCircleFill } from "react-icons/bs";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { toast } from "react-hot-toast";
 import axios from "axios";
@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import Loading from "@/components/button/loading/Loading";
 import Image from "next/image";
 import { IoPersonCircleSharp } from "react-icons/io5";
+import { ChatType } from "@/types";
+import MessageLayout from "./MessageLayout";
 
 
 interface ButtonType {
@@ -47,7 +49,7 @@ const MainContent = () => {
 
     // use form hook
     const {
-        register, handleSubmit, reset, watch,
+        register, handleSubmit, reset, setValue, watch,
         formState: {
             errors
         }
@@ -61,28 +63,41 @@ const MainContent = () => {
     const addingNewUser = watch('addingNewUser')
     const addingNewMessage = watch('addingNewMessage')
 
+    const handleUserValue = (username: string) => {
+        // set username
+        setValue('addingNewUser', username)
+        // step to boxchat
+        setStep(1)
+    }
+
+    const resetMessage = () => {
+        setValue('addingNewMessage', '')
+    }
+
     // submit handler
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
         try {
             setLoading(true)
 
             // check data
-            if(data.addingNewUser) {
-                if(data.addingNewMessage) {
-                    if(session) {
+            if (data.addingNewUser) {
+                if (data.addingNewMessage) {
+                    if (session) {
                         const currentData = {
-                            token: session.tokenVirgo, 
-                            message: data.addingNewMessage, 
+                            token: session.tokenVirgo,
+                            message: data.addingNewMessage,
                             username: data.addingNewUser
                         }
-        
+
                         // send data to the api
                         axios.post('/api/create-message/', currentData).then((data) => {
-                            if(data.status === 200 && data.data.data !== null) {
+                            if (data.status === 200 && data.data.data !== null) {
                                 // refresh page
                                 router.refresh()
                                 // display success msg
                                 toast.success('Message sent successfully!')
+                                // reset message
+                                resetMessage()
                             }
                         }).catch((error) => {
                             // display error msg
@@ -121,7 +136,7 @@ const MainContent = () => {
         setLoading(true)
 
         // if there's an interval, clears it
-        if(timeoutRef.current) clearTimeout(timeoutRef.current)
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
         timeoutRef.current = setTimeout(() => {
             // check if username exists
@@ -130,7 +145,7 @@ const MainContent = () => {
                 const usernameLabel = document.getElementById('existingUsernameLabel')
 
                 // if label, set msg
-                if(usernameLabel) {
+                if (usernameLabel) {
                     usernameLabel.innerText = response.data.exists ? (
                         `Chat with ${addingNewUser}!`
                     ) : (
@@ -145,7 +160,7 @@ const MainContent = () => {
 
     // new message handler
     const handleNewMessage = async () => {
-        if(addingNewUser && isUsername) {
+        if (addingNewUser && isUsername) {
             // set step to chat box
             setStep(1)
             // close modal
@@ -157,15 +172,15 @@ const MainContent = () => {
 
     useEffect(() => {
         // set interval
-        if(addingNewUser.length > 0) handleUsernameTimeout()
+        if (addingNewUser.length > 0) handleUsernameTimeout()
     }, [addingNewUser, handleUsernameTimeout])
 
     // button handler
-    const CurrentButton = ({eventFn, children, type}: ButtonType) => (
+    const CurrentButton = ({ eventFn, children, type }: ButtonType) => (
         <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
         from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
         shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
-        onClick={eventFn} type={type}>
+            onClick={eventFn} type={type}>
             {
                 !loading ? children : type === 'submit' ? <Loading /> : children
             }
@@ -175,43 +190,51 @@ const MainContent = () => {
     // current layout 
     let currentLayout = (
         <>
-            <div className="flex flex-col justify-center items-center my-2 h-fit w-[20%]">
+            <div className="flex flex-col justify-center items-center my-2 mb-4 h-fit w-[20%]">
                 <CurrentButton type="button" eventFn={() => onOpen()}>
                     <BsPlusCircleFill size={25} />
                 </CurrentButton>
             </div>
             {
-                chats.map(item => (
-                    <div className="flex flex-col gap-2 justify-start items-center h-5 w-full bg-blue-800"
-                    key={item.chat[0].id}>
-                        {
-                            item.image ? (
-                                <div className="flex h-[80%] aspect-square rounded-full drop-shadow-[0_0_0.05rem] 
-                                shadow-[#00000080] border-[#481811] border-[1px] overflow-hidden ml-2">
-                                    <Image className="object-cover"
-                                        src={item.image}
-                                        alt={item.name}
-                                        fill
-                                    />
+                chats.map((item, index) => (
+                    <div className="flex gap-2 justify-center items-center h-20 w-[90%]" key={index}>
+                        <Button className="flex gap-2 justify-between items-center rounded-md from-[#ff9e1b] 
+                        to-[#ffcf54] bg-gradient-to-b border-[#ff9e1b] p-2 border-[1px] drop-shadow-[0_0_0.1rem] 
+                        shadow-[rgba(0,0,0,0.57)] overflow-hidden hover:opacity-75 my-2" type="button" disabled={loading}
+                            onClick={() => handleUserValue(item.username)}>
+                            {
+                                item.image ? (
+                                    <div className="flex h-16 aspect-square rounded-full drop-shadow-[0_0_0.05rem] 
+                                    shadow-[#00000080] border-[#481811] border-[1px] overflow-hidden ml-2">
+                                        <Image className="object-cover"
+                                            src={item.image}
+                                            alt={item.name}
+                                            fill
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex h-16 aspect-square overflow-hidden ml-2">
+                                        <IoPersonCircleSharp className="h-full w-full" />
+                                    </div>
+                                )
+                            }
+                            <div className="flex flex-col justify-center items-start text-left h-full w-[93%]">
+                                <div className="relative truncate text-lg text-black font-bold h-fit w-full">
+                                    {item.name}
+                                    <span className="inline-block mx-2 my-[2px]">
+                                        <BsCircleFill size={5} />
+                                    </span>
+                                    <span className="text-gray-800 text-base font-normal">
+                                        {item.username}
+                                    </span>
                                 </div>
-                            ) : (
-                                <div className="flex h-[80%] aspect-square overflow-hidden ml-2">
-                                    <IoPersonCircleSharp className="h-full w-full" />
+                                <div className="relative truncate text-sm text-gray-800 font-normal h-fit w-full">
+                                    {
+                                        item.chat[0].message
+                                    }
                                 </div>
-                            )
-                        }
-                        <div>
-                            <div>
-                                {
-                                    item.name + '-' + item.username
-                                }
                             </div>
-                            <div>
-                                {
-                                    item.chat[0].message
-                                }
-                            </div>
-                        </div>
+                        </Button>
                     </div>
                 ))
             }
@@ -228,55 +251,64 @@ const MainContent = () => {
     )
 
     // if current step is chatbox
-    if(step === STEPS.CHATBOX) currentLayout = (
-        <>
-            {backButton}
-            <div className="flex flex-col justify-between items-center h-[87%] w-[80%] overflow-hidden">
-                <div className="flex flex-col-reverse h-[82%] w-full">
-                    {
-                        chats[0].chat.map(item => (
-                            <div key={item.id}>
-                                {item.message}
-                            </div>
-                        ))
-                    }
-                </div>
-                <div className="flex justify-between items-center h-[15%] w-[50%]">
-                    <div className="flex justify-center items-center h-full w-[85%]">
-                        <Input id="addingNewMessage"
-                            placeholder="Send message..."
-                            type="text"
-                            isLabel={false}
-                            isTextArea={true}
-                            register={register}
-                            errors={errors}
-                            disabled={loading}
-                            value={addingNewMessage}
-                            required
-                        />
+    if (step === STEPS.CHATBOX && addingNewUser) {
+        const currentChat: ChatType = chats.filter(item => item.username === addingNewUser)[0] || {
+            name: '', username: '', image: '', chat: []
+        }
+
+        currentLayout = (
+            <>
+                {backButton}
+                <div className="flex flex-col justify-between items-center h-[87%] w-[80%] overflow-hidden">
+                    <div className="flex flex-col-reverse h-[82%] w-full">
+                        {
+                            currentChat.chat.map(item => (
+                                <MessageLayout key={item.id}
+                                    name={currentChat.name}
+                                    username={currentChat.username}
+                                    image={currentChat.image}
+                                    message={item}
+                                />
+                            ))
+                        }
                     </div>
-                    <div className="flex justify-center items-center h-[95%] aspect-square">
-                        <Button className="flex justify-center items-center from-[#d76752] rounded-full
+                    <div className="flex justify-between items-center h-[15%] w-[50%]">
+                        <div className="flex justify-center items-center h-full w-[85%]">
+                            <Input id="addingNewMessage"
+                                placeholder="Send message..."
+                                type="text"
+                                isLabel={false}
+                                isTextArea={true}
+                                register={register}
+                                errors={errors}
+                                disabled={loading}
+                                value={addingNewMessage}
+                                required
+                            />
+                        </div>
+                        <div className="flex justify-center items-center h-[95%] aspect-square">
+                            <Button className="flex justify-center items-center from-[#d76752] rounded-full
                         via-[#a94e41] to-[#882314] bg-gradient-to-t drop-shadow-[0_1.4px_0.05rem] 
                         shadow-[#00000092] border-[#d76752] border-[1px] hover:opacity-75" type="submit"
-                        onClick={handleSubmit(onSubmit)} disabled={loading}>
-                            {
-                                !loading ? (
-                                    <BsFillSendFill size={20} className="mt-1" />
-                                ) : (
-                                    <Loading />
-                                )
-                            }
-                        </Button>
+                                onClick={handleSubmit(onSubmit)} disabled={loading}>
+                                {
+                                    !loading ? (
+                                        <BsFillSendFill size={20} className="mt-1" />
+                                    ) : (
+                                        <Loading />
+                                    )
+                                }
+                            </Button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </>
-    )
+            </>
+        )
+    }
 
     // render content
     return (
-        <div className="relative flex flex-col justify-start items-center h-[98%] w-[98%] overflow-hidden overflow-y-auto">
+        <div className="relative flex gap-2 flex-col justify-start items-center h-[98%] w-[98%] overflow-hidden overflow-y-auto">
             {currentLayout}
             <Modal open={open} onChange={handleModalClose}>
                 <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[40%] rounded-md
@@ -308,7 +340,7 @@ const MainContent = () => {
                             <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
                             from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
                             shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
-                            type="button" onClick={handleNewMessage}>
+                                type="button" onClick={handleNewMessage}>
                                 {
                                     !loading ? 'Add' : <Loading />
                                 }
@@ -320,5 +352,5 @@ const MainContent = () => {
         </div>
     );
 }
- 
+
 export default MainContent;
