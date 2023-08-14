@@ -65,7 +65,7 @@ export async function POST(request: Request) {
                 })
 
                 if (newMessage) {
-                    pusher.trigger('chat', 'new-message', newMessage)
+                    await pusher.trigger('chat', 'new-message', newMessage)
 
                     // Return the user data in a JSON response
                     return NextResponse.json({ data: newMessage })
