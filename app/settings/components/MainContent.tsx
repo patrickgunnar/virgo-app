@@ -12,6 +12,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import axios from "axios"
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
+import Loading from "@/components/button/loading/Loading"
 
 
 enum STEP {
@@ -346,8 +347,7 @@ const MainContent = () => {
                         <Button className="flex justify-start items-center px-2 py-4 from-[#f1e499] 
                         via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
                         shadow-[#00000092] border-[#b1ba27] border-[1px] min-h-fit overflow-hidden 
-                        rounded-md hover:opacity-75 font-bold text-base"
-                            onClick={() => setStep(index + 1)}>
+                        rounded-md hover:opacity-75 font-bold text-base" onClick={() => setStep(index + 1)}>
                             {item}
                         </Button>
                     </div>
@@ -374,8 +374,11 @@ const MainContent = () => {
             <Button className="flex justify-start items-center px-6 py-4 from-[#f1e499] 
             via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
             shadow-[#00000092] border-[#b1ba27] border-[1px] min-h-fit overflow-hidden 
-            rounded-md hover:opacity-75 font-bold text-base" type="submit" onClick={handleSubmit(onSubmit)}>
-                Submit
+            rounded-md hover:opacity-75 font-bold text-base" type="submit" disabled={isLoading}
+            onClick={handleSubmit(onSubmit)}>
+                {
+                    !isLoading ? 'Submit' : <Loading />
+                }
             </Button>
         </div>
     )

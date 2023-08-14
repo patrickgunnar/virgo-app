@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useSession } from "@/providers/SessionProvider";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/button/loading/Loading";
 
 
 interface ButtonType {
@@ -115,6 +116,8 @@ const MainContent = () => {
     }
 
     const handleUsernameTimeout = useCallback(() => {
+        setLoading(true)
+
         // if there's an interval, clears it
         if(timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -134,7 +137,7 @@ const MainContent = () => {
 
                     setIsUsername(response.data.exists ? true : false)
                 }
-            })
+            }).finally(() => setLoading(false))
         }, 1000)
     }, [addingNewUser])
 
@@ -159,8 +162,11 @@ const MainContent = () => {
     const CurrentButton = ({eventFn, children, type}: ButtonType) => (
         <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
         from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={eventFn} type={type}>
-            {children}
+        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
+        onClick={eventFn} type={type}>
+            {
+                !loading ? children : type === 'submit' ? <Loading /> : children
+            }
         </Button>
     )
 
@@ -216,8 +222,14 @@ const MainContent = () => {
                         <Button className="flex justify-center items-center from-[#d76752] rounded-full
                         via-[#a94e41] to-[#882314] bg-gradient-to-t drop-shadow-[0_1.4px_0.05rem] 
                         shadow-[#00000092] border-[#d76752] border-[1px] hover:opacity-75" type="submit"
-                        onClick={handleSubmit(onSubmit)}>
-                            <BsFillSendFill size={20} className="mt-1" />
+                        onClick={handleSubmit(onSubmit)} disabled={loading}>
+                            {
+                                !loading ? (
+                                    <BsFillSendFill size={20} className="mt-1" />
+                                ) : (
+                                    <Loading />
+                                )
+                            }
                         </Button>
                     </div>
                 </div>
@@ -251,7 +263,7 @@ const MainContent = () => {
                     </div>
                     <div className="flex justify-between items-center h-fit w-[80%]">
                         <div className="flex justify-center items-center h-fit w-[40%]">
-                            <CurrentButton type="submit" eventFn={() => handleModalClose()}>
+                            <CurrentButton type="button" eventFn={() => handleModalClose()}>
                                 Cancel
                             </CurrentButton>
                         </div>
