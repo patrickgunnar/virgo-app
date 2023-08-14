@@ -34,7 +34,7 @@ export async function POST(request: Request) {
                     ]
                 },
                 orderBy: {
-                    created_at: 'asc'
+                    created_at: 'desc'
                 }
             })
 
