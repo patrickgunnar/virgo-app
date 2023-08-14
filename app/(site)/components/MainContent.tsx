@@ -268,9 +268,14 @@ const MainContent = () => {
                             </CurrentButton>
                         </div>
                         <div className="flex justify-center items-center h-fit w-[40%]">
-                            <CurrentButton type="submit" eventFn={handleNewMessage}>
-                                Add
-                            </CurrentButton>
+                            <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
+                            from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
+                            shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
+                            type="button" onClick={handleNewMessage}>
+                                {
+                                    !loading ? 'Add' : <Loading />
+                                }
+                            </Button>
                         </div>
                     </div>
                 </div>
