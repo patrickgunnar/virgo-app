@@ -147,12 +147,17 @@ const MainContent = () => {
                 // if label, set msg
                 if (usernameLabel) {
                     usernameLabel.innerText = response.data.exists ? (
-                        `Chat with ${addingNewUser}!`
+                        `Chat with @${addingNewUser}!`
                     ) : (
                         "Username does not exist!"
                     )
 
                     setIsUsername(response.data.exists ? true : false)
+                }
+
+                if(usernameLabel && session?.username === addingNewUser) {
+                    usernameLabel.innerText = "Please, choose a unique username that is different from your own!"
+                    setIsUsername(false)
                 }
             }).finally(() => setLoading(false))
         }, 1000)
@@ -251,7 +256,7 @@ const MainContent = () => {
     )
 
     // if current step is chatbox
-    if (step === STEPS.CHATBOX && addingNewUser) {
+    if (step === STEPS.CHATBOX && addingNewUser && session) {
         const currentChat: ChatType = chats.filter(item => item.username === addingNewUser)[0] || {
             name: '', username: '', image: '', chat: []
         }
@@ -260,16 +265,22 @@ const MainContent = () => {
             <>
                 {backButton}
                 <div className="flex flex-col justify-between items-center h-[87%] w-[80%] overflow-hidden">
-                    <div className="flex flex-col-reverse h-[82%] w-full">
+                    <div className="flex flex-col-reverse h-[82%] w-full overflow-hidden overflow-y-auto no-scrollbar">
                         {
-                            currentChat.chat.map(item => (
-                                <MessageLayout key={item.id}
-                                    name={currentChat.name}
-                                    username={currentChat.username}
-                                    image={currentChat.image}
-                                    message={item}
-                                />
-                            ))
+                            currentChat.chat.map(item => {
+                                const currentName = session.id === item.senderId ? session.name : currentChat.name
+                                const currentImage = session.id === item.senderId ? session.image : currentChat.image
+                                const currentUsername = session.id === item.senderId ? session.username : currentChat.username
+
+                                return (
+                                    <MessageLayout key={item.id}
+                                        name={currentName}
+                                        username={currentUsername}
+                                        image={currentImage}
+                                        message={item}
+                                    />
+                                )
+                            })
                         }
                     </div>
                     <div className="flex justify-between items-center h-[15%] w-[50%]">
