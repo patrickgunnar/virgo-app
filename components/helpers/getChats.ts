@@ -4,12 +4,12 @@ import { MessageType, ChatType } from "@/types";
 import axios from "axios";
 
 
-const getChats = (userId: string | null | undefined, messages: MessageType[]) => {
+const getChats = async (userId: string | null | undefined, messages: MessageType[]) => {
     const chats: ChatType[] = []
     const usedIds: string[] = []
 
     if (messages && userId) {
-        messages.forEach(async (item) => {
+        for(const item of messages) {
             const currentUser = item.senderId === userId ? item.receiverId : item.senderId
             
             if(!usedIds.includes(currentUser)) {
@@ -20,6 +20,7 @@ const getChats = (userId: string | null | undefined, messages: MessageType[]) =>
                     content.receiverId === currentUser ||
                     content.senderId === currentUser
                 ))
+
                 chats.push({
                     name,
                     username,
@@ -27,7 +28,7 @@ const getChats = (userId: string | null | undefined, messages: MessageType[]) =>
                     chat: tempArray
                 })
             }
-        })
+        }
     }
 
     return chats
