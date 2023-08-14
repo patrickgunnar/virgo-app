@@ -3,14 +3,15 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Cookies from 'js-cookie';
-import { MessageType, UserType } from "@/types";
+import { ChatType, MessageType, UserType } from "@/types";
 import { useRouter } from "next/navigation";
 import PusherClient from "pusher-js";
+import getChats from "@/components/helpers/getChats";
 
 
 const SessionContext = createContext({
     session: null as UserType | null,
-    messages: [] as MessageType[],
+    chats: [] as ChatType[],
     loading: true,
     handleSession: () => { },
     handleLogout: () => { }
@@ -36,6 +37,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
 
     const [session, setSession] = useState<UserType | null>(null)
     const [messages, setMessages] = useState<MessageType[]>([])
+    const [chats, setChats] = useState<ChatType[]>([])
     const { loading, startLoading, stopLoading } = useLoadingState(true)
 
     // pusher ref
@@ -141,7 +143,19 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
             }
         }
     }, [session])
-    
+
+    useEffect(() => {
+        // get chats
+        const handleChatFilter = async () => {
+            if(session) {
+                const chats = await getChats(session.id, messages)
+
+                setChats(chats)
+            }
+        }
+
+        handleChatFilter()
+    }, [session, messages])
 
     // set session
     const handleSession = async () => await handleUserToken()
@@ -149,11 +163,11 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     // context
     const context = useMemo(() => ({
         session: session,
-        messages: messages,
+        chats: chats,
         loading: loading,
         handleSession: handleSession,
         handleLogout: handleLogout
-    }), [session, loading, messages])
+    }), [session, loading, chats])
 
     return (
         <SessionContext.Provider value={context}>
