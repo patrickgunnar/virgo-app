@@ -132,6 +132,14 @@ const MainContent = () => {
         reset()
     }
 
+    // back button handler
+    const handleBack = () => {
+        // set step
+        setStep(0)
+        // reset form
+        reset()
+    }
+
     const handleUsernameTimeout = useCallback(() => {
         setLoading(true)
 
@@ -249,7 +257,7 @@ const MainContent = () => {
     // back btn
     const backButton = (
         <div className="flex flex-col justify-start items-center p-4 h-fit w-fit self-start">
-            <CurrentButton type="button" eventFn={() => setStep(0)}>
+            <CurrentButton type="button" eventFn={handleBack}>
                 Back
             </CurrentButton>
         </div>
