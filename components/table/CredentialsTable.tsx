@@ -9,6 +9,7 @@ import axios from "axios";
 import Cookies from 'js-cookie';
 import { useRouter } from "next/navigation";
 import { useSession } from "@/providers/SessionProvider";
+import Loading from "../button/loading/Loading";
 
 
 interface ButtonType {
@@ -165,6 +166,8 @@ const CredentialsTable = () => {
     }
 
     const handleUsernameTimeout = useCallback(() => {
+        setIsLoading(true)
+
         // if there's an interval, clears it
         if(timeoutRef.current) clearTimeout(timeoutRef.current)
 
@@ -180,7 +183,7 @@ const CredentialsTable = () => {
                     ) : (
                         "Username: it's available, you can use it!"
                     )
-            })
+            }).finally(() => setIsLoading(false))
         }, 1000)
     }, [usernameData])
 
@@ -193,8 +196,11 @@ const CredentialsTable = () => {
     const CurrentButton = ({eventFn, label, type}: ButtonType) => (
         <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
         from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" onClick={eventFn} type={type}>
-            {label}
+        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" type={type} disabled={isLoading}
+        onClick={eventFn}>
+            {
+                !isLoading ? label : type === 'submit' ? <Loading /> : label
+            }
         </Button>
     )
 
