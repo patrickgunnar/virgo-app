@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ClientTable from "./ClientTable";
 import CredentialsTable from "./CredentialsTable";
 import { useSession } from "@/providers/SessionProvider";
+import Loading from "../loading/Loading";
 
 
 interface ClientOnlyProps {
@@ -28,7 +29,7 @@ const ClientOnly: React.FC<ClientOnlyProps> = ({
 
     // render elements
     return (
-        client && loading === false ? currentLayout : <div>Loading</div>
+        client && loading === false ? currentLayout : <Loading />
     );
 }
  
