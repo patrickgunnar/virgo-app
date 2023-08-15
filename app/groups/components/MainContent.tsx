@@ -27,6 +27,11 @@ enum STEPS {
     CHATBOX = 1
 }
 
+enum MODAL {
+    NEWUSER = 1,
+    NEWGROUP = 2
+}
+
 const MainContent = () => {
     // get session data and logout handler
     const { session, groups } = useSession()
@@ -42,7 +47,9 @@ const MainContent = () => {
     // username state
     const [isUsername, setIsUsername] = useState<boolean>(false)
     // model content
-    const [isGroup, setIsGroup] = useState<boolean | null>(null)
+    const [modalStep, setModalStep] = useState<number>(0)
+    // current group id
+    const [currentDisplayGroupId, setCurrentDisplayGroupId] = useState<string | null>(null)
 
     // interval ref
     const timeoutRef = useRef<NodeJS.Timer>()
@@ -66,8 +73,8 @@ const MainContent = () => {
     const addingNewGroup = watch('addingNewGroup')
 
     const handleGroupValue = (id: string) => {
-        // set username
-        setValue('addingNewGroup', id)
+        // set group's id
+        setCurrentDisplayGroupId(id)
         // step to boxchat
         setStep(1)
     }
@@ -82,14 +89,14 @@ const MainContent = () => {
             setLoading(true)
 
             // check data
-            if (data.addingNewGroup) {
+            if (currentDisplayGroupId) {
                 if (data.addingNewMessage) {
                     if (session) {
                         const currentData = {
                             token: session.tokenVirgo,
                             message: data.addingNewMessage,
                             username: session.username,
-                            groupId: data.addingNewGroup
+                            groupId: currentDisplayGroupId
                         }
 
                         // send data to the api
@@ -130,86 +137,105 @@ const MainContent = () => {
 
     // new group handler
     const onNewGroupSubmit: SubmitHandler<FieldValues> = async (data) => {
-        try {
-            setLoading(true)
+        // add new group handler
+        if (MODAL.NEWGROUP === modalStep) {
+            try {
+                setLoading(true)
 
-            // check data
-            if (data.addingNewGroup && session) {
-                const currentData = {
-                    token: session.tokenVirgo,
-                    groupName: data.addingNewGroup
-                }
-
-                // send data to the api
-                axios.post('/api/create-group/', currentData).then((data) => {
-                    if (data.status === 200 && data.data.data !== null) {
-                        // refresh page
-                        router.refresh()
-                        // display success msg
-                        toast.success('Group created successfully!')
-                        // reset message
-                        resetMessage()
+                // check data
+                if (data.addingNewGroup && session) {
+                    const currentData = {
+                        token: session.tokenVirgo,
+                        groupName: data.addingNewGroup
                     }
-                }).catch((error) => {
+
+                    // send data to the api
+                    axios.post('/api/create-group/', currentData).then((data) => {
+                        if (data.status === 200 && data.data.data !== null) {
+                            // refresh page
+                            router.refresh()
+                            // display success msg
+                            toast.success('Group created successfully!')
+                            // reset message
+                            resetMessage()
+                        }
+                    }).catch((error) => {
+                        // display error msg
+                        toast.error("Sorry, your group wasn't created. Please, try creating it again!")
+                    }).finally(() => setLoading(false))
+                } else {
+                    setLoading(false)
                     // display error msg
-                    toast.error("Sorry, your group wasn't created. Please, try creating it again!")
-                }).finally(() => setLoading(false))
-            } else {
+                    toast.error('Please, enter the group name!')
+                }
+            } catch (error) {
                 setLoading(false)
                 // display error msg
-                toast.error('Please, enter the group name!')
+                toast.error('Something went wrong, try again!')
             }
-        } catch (error) {
-            setLoading(false)
-            // display error msg
-            toast.error('Something went wrong, try again!')
+        }
+        
+        // add new user to group handler
+        if(MODAL.NEWUSER === modalStep) {
+            try {
+                setLoading(true)
+
+                // check data
+                if (data.addingNewUser && session && currentDisplayGroupId) {
+                    const currentData = {
+                        token: session.tokenVirgo,
+                        username: data.addingNewUser,
+                        groupId: currentDisplayGroupId
+                    }
+
+                    // send data to the api
+                    axios.post('/api/add-user-group/', currentData).then((data) => {
+                        if (data.status === 200 && data.data.data !== null) {
+                            // refresh page
+                            router.refresh()
+                            // display success msg
+                            toast.success('User added successfully!')
+                            // reset message
+                            resetMessage()
+                        }
+                    }).catch((error) => {
+                        // display error msg
+                        toast.error("Sorry, the user wasn't added to the group. Please, try adding it again!")
+                    }).finally(() => setLoading(false))
+                } else {
+                    setLoading(false)
+                    // display error msg
+                    toast.error('Please, enter the new username!')
+                }
+            } catch (error) {
+                setLoading(false)
+                // display error msg
+                toast.error('Something went wrong, try again!')
+            }
         }
     }
 
-    // new group handler
-    const onNewUserSubmit: SubmitHandler<FieldValues> = async (data) => {
-        try {
-            setLoading(true)
+    // send message trigger
+    const triggerSendMessage = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
 
-            // check data
-            if (data.addingNewUser && session && data.addingNewGroup) {
-                const currentData = {
-                    token: session.tokenVirgo,
-                    username: data.addingNewUser,
-                    groupId: data.addingNewGroup
-                }
+        // trigger submit handler
+        handleSubmit(onSubmit)()
+    }
 
-                // send data to the api
-                axios.post('/api/add-user-group/', currentData).then((data) => {
-                    if (data.status === 200 && data.data.data !== null) {
-                        // refresh page
-                        router.refresh()
-                        // display success msg
-                        toast.success('User added successfully!')
-                        // reset message
-                        resetMessage()
-                    }
-                }).catch((error) => {
-                    // display error msg
-                    toast.error("Sorry, the user wasn't added to the group. Please, try adding it again!")
-                }).finally(() => setLoading(false))
-            } else {
-                setLoading(false)
-                // display error msg
-                toast.error('Please, enter the new username!')
-            }
-        } catch (error) {
-            setLoading(false)
-            // display error msg
-            toast.error('Something went wrong, try again!')
-        }
+    // add new user trigger
+    const triggerNewUserGroup = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
+
+        // trigger submit handler
+        handleSubmit(onNewGroupSubmit)()
     }
 
     // close modal
     const handleModalClose = () => {
         onClose()
         // reset form
-        setValue('addingNewUser', '')
+        reset()
     }
 
     // back button handler
@@ -220,22 +246,10 @@ const MainContent = () => {
         reset()
     }
 
-    // new message handler
-    const handleNewMessage = () => {
-        if (addingNewUser && isUsername) {
-            // set step to chat box
-            setStep(1)
-            // close modal
-            onClose()
-        } else {
-            toast.error('Enter a valid username!')
-        }
-    }
-
     // new group modal layout handler
     const handleNewGroupModalLayout = () => {
         // set modal content
-        setIsGroup(true)
+        setModalStep(2)
         // open modal
         onOpen()
     }
@@ -243,7 +257,7 @@ const MainContent = () => {
     // new user to group modal layout handler
     const handleNewUserGroupModalLayout = () => {
         // set modal content
-        setIsGroup(false)
+        setModalStep(1)
 
         // open modal
         onOpen()
@@ -272,7 +286,7 @@ const MainContent = () => {
                     setIsUsername(response.data.exists ? true : false)
                 }
 
-                if(usernameLabel && session?.username === addingNewUser) {
+                if (usernameLabel && session?.username === addingNewUser) {
                     usernameLabel.innerText = "Please, choose a unique username that is different from your own!"
                     setIsUsername(false)
                 }
@@ -311,7 +325,7 @@ const MainContent = () => {
                         <Button className="flex gap-2 justify-between items-center rounded-md from-[#ff9e1b] 
                         to-[#ffcf54] bg-gradient-to-b border-[#ff9e1b] p-2 border-[1px] drop-shadow-[0_0_0.1rem] 
                         shadow-[rgba(0,0,0,0.57)] overflow-hidden hover:opacity-75 my-2" type="button" disabled={loading}
-                        onClick={() => handleGroupValue(item.groupData.id)}>
+                            onClick={() => handleGroupValue(item.groupData.id)}>
                             <div className="flex h-16 aspect-square overflow-hidden ml-2">
                                 <MdGroupWork className="h-full w-full" />
                             </div>
@@ -339,9 +353,85 @@ const MainContent = () => {
         </div>
     )
 
+    // submit button
+    const submitButton = (
+        <div className="flex justify-center items-center h-fit w-[40%]">
+            <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
+            from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
+            shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
+                type="submit" onClick={triggerNewUserGroup}>
+                {
+                    !loading ? 'Add' : <Loading />
+                }
+            </Button>
+        </div>
+    )
+
+    // modal layout
+    let currentModalLayout = <></>
+
+    // if modal step is to add new user to group
+    if(modalStep === MODAL.NEWUSER) currentModalLayout = (
+        <>
+            <label className="relative truncate text-center text-base font-bold h-fit w-full">
+                Contact
+            </label>
+            <div className="flex h-fit w-[90%]">
+                <Input id="addingNewUser"
+                    label="Please, provide the username you wish to add:"
+                    placeholder="Add new user to your group"
+                    labelId="existingUsernameLabel"
+                    type="text"
+                    register={register}
+                    errors={errors}
+                    disabled={false}
+                    value={addingNewUser}
+                    required
+                />
+            </div>
+            <div className="flex justify-between items-center h-fit w-[80%]">
+                <div className="flex justify-center items-center h-fit w-[40%]">
+                    <CurrentButton type="button" eventFn={() => handleModalClose()}>
+                        Cancel
+                    </CurrentButton>
+                </div>
+                {submitButton}
+            </div>
+        </>
+    )
+
+    // if modal step is to create new group
+    if(modalStep === MODAL.NEWGROUP) currentModalLayout = (
+        <>
+            <label className="relative truncate text-center text-base font-bold h-fit w-full">
+                Group
+            </label>
+            <div className="flex h-fit w-[90%]">
+                <Input id="addingNewGroup"
+                    label="Please, provide the group name:"
+                    placeholder="Add the name of the group"
+                    type="text"
+                    register={register}
+                    errors={errors}
+                    disabled={false}
+                    value={addingNewGroup}
+                    required
+                />
+            </div>
+            <div className="flex justify-between items-center h-fit w-[80%]">
+                <div className="flex justify-center items-center h-fit w-[40%]">
+                    <CurrentButton type="button" eventFn={() => handleModalClose()}>
+                        Cancel
+                    </CurrentButton>
+                </div>
+                {submitButton}
+            </div>
+        </>
+    )
+
     // if current step is chatbox
-    if (step === STEPS.CHATBOX && addingNewGroup && session) {
-        const currentGroup = groups.filter(item => item.groupData.id === addingNewGroup)[0] 
+    if (step === STEPS.CHATBOX && currentDisplayGroupId && session) {
+        const currentGroup = groups.filter(item => item.groupData.id === currentDisplayGroupId)[0]
 
         currentLayout = (
             <>
@@ -358,7 +448,7 @@ const MainContent = () => {
                                     <label>:</label>
                                 </div>
                                 <div className="relative truncate h-fit w-[60%]">
-                                    <div className="animate-marquee">
+                                    <div className="flex animate-marquee">
                                         {
                                             currentGroup.membersData.map((user, index) => (
                                                 <div key={index} className="flex justify-center items-center px-2 h-fit w-fit">
@@ -409,14 +499,13 @@ const MainContent = () => {
                                 errors={errors}
                                 disabled={loading}
                                 value={addingNewMessage}
-                                required
                             />
                         </div>
                         <div className="flex justify-center items-center h-[95%] aspect-square">
                             <Button className="flex justify-center items-center from-[#d76752] rounded-full
                             via-[#a94e41] to-[#882314] bg-gradient-to-t drop-shadow-[0_1.4px_0.05rem] 
                             shadow-[#00000092] border-[#d76752] border-[1px] hover:opacity-75" type="submit"
-                                onClick={handleSubmit(onSubmit)} disabled={loading}>
+                                onClick={triggerSendMessage} disabled={loading}>
                                 {
                                     !loading ? (
                                         <BsFillSendFill size={20} className="mt-1" />
@@ -437,83 +526,10 @@ const MainContent = () => {
         self-start overflow-hidden overflow-y-auto">
             {currentLayout}
             <Modal open={open} onChange={handleModalClose}>
-                <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[40%] rounded-md
+                <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[98%] md:w-[40%] rounded-md
                 from-[#c77d29] via-[#c66f22] to-[#ae5817] bg-gradient-to-b border-[#c66f22]
                 border-[1px] drop-shadow-[0_0_0.5rem] shadow-[rgba(0,0,0,0.57)] overflow-hidden my-2">
-                    {
-                        isGroup ? (
-                            <>
-                                <label className="relative truncate text-center text-base font-bold h-fit w-full">
-                                    Group
-                                </label>
-                                <div className="flex h-fit w-[90%]">
-                                    <Input id="addingNewGroup"
-                                        label="Please, provide the group name:"
-                                        placeholder="Add the name of the group"
-                                        type="text"
-                                        register={register}
-                                        errors={errors}
-                                        disabled={false}
-                                        value={addingNewGroup}
-                                        required
-                                    />
-                                </div>
-                                <div className="flex justify-between items-center h-fit w-[80%]">
-                                    <div className="flex justify-center items-center h-fit w-[40%]">
-                                        <CurrentButton type="button" eventFn={() => handleModalClose()}>
-                                            Cancel
-                                        </CurrentButton>
-                                    </div>
-                                    <div className="flex justify-center items-center h-fit w-[40%]">
-                                        <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
-                                        from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-                                        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
-                                            type="submit" onClick={handleSubmit(onNewGroupSubmit)}>
-                                            {
-                                                !loading ? 'Add' : <Loading />
-                                            }
-                                        </Button>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <label className="relative truncate text-center text-base font-bold h-fit w-full">
-                                    Contact
-                                </label>
-                                <div className="flex h-fit w-[90%]">
-                                    <Input id="addingNewUser"
-                                        label="Please, provide the username you wish to contact:"
-                                        placeholder="Add new user to your contact"
-                                        labelId="existingUsernameLabel"
-                                        type="text"
-                                        register={register}
-                                        errors={errors}
-                                        disabled={false}
-                                        value={addingNewUser}
-                                        required
-                                    />
-                                </div>
-                                <div className="flex justify-between items-center h-fit w-[80%]">
-                                    <div className="flex justify-center items-center h-fit w-[40%]">
-                                        <CurrentButton type="button" eventFn={() => handleModalClose()}>
-                                            Cancel
-                                        </CurrentButton>
-                                    </div>
-                                    <div className="flex justify-center items-center h-fit w-[40%]">
-                                        <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
-                                        from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-                                        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
-                                            type="button" onClick={handleNewMessage}>
-                                            {
-                                                !loading ? 'Add' : <Loading />
-                                            }
-                                        </Button>
-                                    </div>
-                                </div>
-                            </>
-                        )
-                    }
+                    {currentModalLayout}
                 </div>
             </Modal>
         </div>
