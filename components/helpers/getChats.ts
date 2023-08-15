@@ -15,7 +15,7 @@ const getChats = async (userId: string | null | undefined, messages: MessageType
             if(!usedIds.includes(currentUser) && currentUser !== userId) {
                 usedIds.push(currentUser)
 
-                const { name, username, image } = await (await axios.post('/api/get-user/', { userId: currentUser })).data
+                const { name, username, image, bio } = await (await axios.post('/api/get-user/', { userId: currentUser })).data
                 const tempArray = messages.filter(content => (
                     content.receiverId === currentUser ||
                     content.senderId === currentUser
@@ -25,6 +25,7 @@ const getChats = async (userId: string | null | undefined, messages: MessageType
                     name,
                     username,
                     image,
+                    bio,
                     chat: tempArray
                 })
             }

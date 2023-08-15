@@ -13,10 +13,11 @@ interface MessageLayoutProps {
     image: string
     message: MessageType
     isCurrentUser: boolean
+    bio: string
 }
 
 const MessageLayout: React.FC<MessageLayoutProps> = ({
-    name, username, image, message, isCurrentUser
+    name, username, image, message, isCurrentUser, bio
 }) => {
     return (
         <div className={clsx(`flex gap-4 justify-start items-center py-2 px-4 my-2 h-fit w-full md:w-fit md:max-w-[70%] rounded-md 
@@ -48,6 +49,12 @@ const MessageLayout: React.FC<MessageLayoutProps> = ({
                     <span className="text-gray-800 text-base font-normal">
                         {username}
                     </span>
+                </div>
+                <div className="relative truncate text-sm text-black font-normal border-[#ae5817] border-t-[1px] 
+                border-b-[1px] py-1 my-1 h-fit w-full">
+                    <div className="animate-marquee">
+                        {bio}
+                    </div>
                 </div>
                 <div className="relative break-words text-base text-gray-800 font-normal 
                 h-fit w-fit overflow-x-hidden">

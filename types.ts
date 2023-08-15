@@ -22,6 +22,7 @@ export interface ChatType {
     username: string
     name: string
     image: string
+    bio: string
     chat: MessageType[]
 }
 

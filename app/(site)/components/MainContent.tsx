@@ -280,6 +280,7 @@ const MainContent = () => {
                                 const currentName = session.id === item.senderId ? session.name : currentChat.name
                                 const currentImage = session.id === item.senderId ? session.image : currentChat.image
                                 const currentUsername = session.id === item.senderId ? session.username : currentChat.username
+                                const currentBio = session.id === item.senderId ? session.bio : currentChat.name
 
                                 return (
                                     <MessageLayout key={item.id}
@@ -288,6 +289,7 @@ const MainContent = () => {
                                         image={currentImage}
                                         message={item}
                                         isCurrentUser={session.id === item.senderId}
+                                        bio={currentBio}
                                     />
                                 )
                             })
