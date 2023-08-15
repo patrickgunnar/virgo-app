@@ -37,11 +37,15 @@ export interface GroupMember {
     image: string | null
     username: string
     bio: string
+    userId: string
     groupMembershipId: string
 }
 
 export interface GroupType {
     messages: MessageType[]
     membersData: GroupMember[]
-    groupData: GroupDataType
+    groupData: {
+        id: string
+        name: string
+    }
 }
