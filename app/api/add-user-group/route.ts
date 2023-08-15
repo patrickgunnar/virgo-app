@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/components/libs/prismadb";
 import jwt from "jsonwebtoken";
 import Pusher from "pusher";
+import { removeSpecialChar } from "../helpers";
 
 
 // Define an interface for the decoded JWT payload
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
 
         const newUser = await prisma.user.findUnique({
             where: {
-                username: username
+                username: removeSpecialChar(username)
             }
         })
 
