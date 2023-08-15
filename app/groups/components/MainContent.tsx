@@ -77,13 +77,14 @@ const MainContent = () => {
             setLoading(true)
 
             // check data
-            if (data.addingNewUser) {
+            if (data.addingNewGroup) {
                 if (data.addingNewMessage) {
                     if (session) {
                         const currentData = {
                             token: session.tokenVirgo,
                             message: data.addingNewMessage,
-                            username: data.addingNewUser
+                            username: session.username,
+                            groupId: data.addingNewGroup
                         }
 
                         // send data to the api
@@ -152,6 +153,45 @@ const MainContent = () => {
                 setLoading(false)
                 // display error msg
                 toast.error('Please, enter the group name!')
+            }
+        } catch (error) {
+            setLoading(false)
+            // display error msg
+            toast.error('Something went wrong, try again!')
+        }
+    }
+
+    // new group handler
+    const onNewUserSubmit: SubmitHandler<FieldValues> = async (data) => {
+        try {
+            setLoading(true)
+
+            // check data
+            if (data.addingNewUser && session && data.addingNewGroup) {
+                const currentData = {
+                    token: session.tokenVirgo,
+                    username: data.addingNewUser,
+                    groupId: data.addingNewGroup
+                }
+
+                // send data to the api
+                axios.post('/api/add-user-group/', currentData).then((data) => {
+                    if (data.status === 200 && data.data.data !== null) {
+                        // refresh page
+                        router.refresh()
+                        // display success msg
+                        toast.success('User added successfully!')
+                        // reset message
+                        resetMessage()
+                    }
+                }).catch((error) => {
+                    // display error msg
+                    toast.error("Sorry, the user wasn't added to the group. Please, try adding it again!")
+                }).finally(() => setLoading(false))
+            } else {
+                setLoading(false)
+                // display error msg
+                toast.error('Please, enter the new username!')
             }
         } catch (error) {
             setLoading(false)
