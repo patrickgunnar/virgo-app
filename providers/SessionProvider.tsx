@@ -3,7 +3,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Cookies from 'js-cookie';
-import { ChatType, MessageType, UserType } from "@/types";
+import { ChatType, GroupDataType, GroupType, MessageType, UserType } from "@/types";
 import { useRouter } from "next/navigation";
 import PusherClient from "pusher-js";
 import getChats from "@/components/helpers/getChats";
@@ -12,6 +12,7 @@ import getChats from "@/components/helpers/getChats";
 const SessionContext = createContext({
     session: null as UserType | null,
     chats: [] as ChatType[],
+    groups: [] as GroupType[],
     loading: true,
     handleSession: () => { },
     handleLogout: () => { }
@@ -38,10 +39,25 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const [session, setSession] = useState<UserType | null>(null)
     const [messages, setMessages] = useState<MessageType[]>([])
     const [chats, setChats] = useState<ChatType[]>([])
+    const [groupsData, setGroupsData] = useState<GroupDataType[]>([])
+    const [groups, setGroups] = useState<GroupType[]>([])
     const { loading, startLoading, stopLoading } = useLoadingState(true)
 
     // pusher ref
     const pusherRef = useRef<any>(null)
+
+    // retrieve groups
+    const handleGroupsMessages = async (userId: string) => {
+        try {
+            if(userId) {
+                const groupsMessages = (await axios.post('/api/get-groups/', { userId })).data.data
+
+                setGroups(groupsMessages || [])
+            }
+        } catch (error) {
+            console.error("Error fetching messages:", error)
+        }
+    }
 
     // retrieve user's messages
     const handleMessagesData = async (userToken: string) => {
@@ -122,6 +138,15 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                             setMessages(prevMessages => [ data, ...prevMessages ])
                         }
                     })
+
+                    // Listen for the "new-group" event
+                    channel.bind('new-group', (data: GroupDataType) => {
+                        // Check if the group involves the current user
+                        if(session.id === data.groupMembers) {
+                            // Add the new group to the group state
+                            setGroupsData(prevGroups => [data, ...prevGroups])
+                        }
+                    })
     
                     // Store the Pusher instance in a ref
                     pusherRef.current = pusherInstance;
@@ -157,6 +182,10 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
         handleChatFilter()
     }, [session, messages])
 
+    useEffect(() => {
+        if(session) handleGroupsMessages(session.id)
+    }, [session, groupsData])
+
     // set session
     const handleSession = async () => await handleUserToken()
 
@@ -164,10 +193,11 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
     const context = useMemo(() => ({
         session: session,
         chats: chats,
+        groups: groups,
         loading: loading,
         handleSession: handleSession,
         handleLogout: handleLogout
-    }), [session, loading, chats])
+    }), [session, loading, chats, groups])
 
     return (
         <SessionContext.Provider value={context}>
