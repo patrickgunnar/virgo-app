@@ -10,7 +10,8 @@ interface UserData {
     email: string
     username: string
     image: string | null
-    bio: string
+    bio: string,
+    groups: string[]
 }
 
 interface DecodedType {
@@ -19,57 +20,75 @@ interface DecodedType {
     exp: number
 }
 
-export async function POST(request: Request) {
-    try {
-        // Parse the request body
-        const { sessionValue } = await request.json()
+// Constants and configurations
+const JWT_SECRET = process.env.JWT_SECRET || ""
 
-        if (sessionValue) {
-            // Check if a user with the given session token exists
-            const user = await prisma.user.findFirst({
+// Interfaces remain the same
+
+async function getUserData(sessionValue: string): Promise<UserData | null> {
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                tokenVirgo: sessionValue,
+            },
+        })
+
+        if (user) {
+            const userGroups = await prisma.groupMembership.findMany({
                 where: {
-                    tokenVirgo: sessionValue,
+                    userId: user.id,
+                },
+                select: {
+                    groupId: true,
                 },
             })
 
-            if (user) {
-                // Ensure the secret key for JWT is provided
-                const secretKey = process.env.JWT_SECRET || ""
+            try {
+                const decoded = jwt.verify(sessionValue, JWT_SECRET) as DecodedType
 
-                try {
-                    // Verify the JWT token and decode its contents
-                    const decoded = jwt.verify(sessionValue, secretKey) as DecodedType
+                const tokenValid = Date.now() < decoded.exp * 1000
 
-                    // Check if the token is still valid
-                    const tokenValid = Date.now() < decoded.exp * 1000
-
-                    if (tokenValid && decoded.userId === user.id) {
-                        const userData: UserData = {
-                            id: user.id,
-                            name: user.name,
-                            tokenVirgo: user.tokenVirgo,
-                            email: user.email,
-                            username: user.username,
-                            image: user.image,
-                            bio: user.bio,
-                        }
-
-                        // Return the user data in a JSON response
-                        return NextResponse.json({ data: userData })
+                if (tokenValid && decoded.userId === user.id) {
+                    const userData: UserData = {
+                        id: user.id,
+                        name: user.name,
+                        tokenVirgo: user.tokenVirgo,
+                        email: user.email,
+                        username: user.username,
+                        image: user.image,
+                        bio: user.bio,
+                        groups: userGroups.length > 0 ? userGroups.map((id) => id.groupId) : []
                     }
-                } catch (jwtError) {
-                    console.error("JWT decoding error:", jwtError)
+
+                    return userData
                 }
+            } catch (jwtError) {
+                console.error("JWT decoding error:", jwtError)
             }
         }
 
-        // Return null data in a JSON response
+        return null
+    } catch (error: any) {
+        console.error("Error while fetching user data:", error)
+        return null
+    }
+}
+
+export async function POST(request: Request) {
+    try {
+        const { sessionValue } = await request.json()
+
+        if (sessionValue) {
+            const userData = await getUserData(sessionValue)
+
+            if (userData) {
+                return NextResponse.json({ data: userData })
+            }
+        }
+
         return NextResponse.json({ data: null })
     } catch (error: any) {
-        // Handle errors gracefully
         console.error("Request error:", error)
-
-        // Return an error response with status code 500
         return new NextResponse("Internal error!", {
             status: 500,
         })
