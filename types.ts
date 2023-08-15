@@ -42,6 +42,6 @@ export interface GroupMember {
 
 export interface GroupType {
     messages: MessageType[]
-    membersData: GroupDataType[]
+    membersData: GroupMember[]
     groupData: GroupDataType
 }
