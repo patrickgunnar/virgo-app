@@ -48,13 +48,13 @@ export default function About() {
                     <strong>Next.js:</strong> Next.js brings powerful server-side rendering (SSR) and static site generation (SSG) capabilities, ensuring fast and dynamic web application development.
                 </li>
                 <li className="list-item px-4">
-                    <strong>React.js:</strong> React.js, a widely used JavaScript library for UI development, underpins VirgoChat's responsive and interactive interface.
+                    <strong>React.js:</strong> React.js, a widely used JavaScript library for UI development, underpins VirgoChat&apos;s responsive and interactive interface.
                 </li>
                 <li className="list-item px-4">
                     <strong>Axios:</strong> Axios facilitates smooth API communication, ensuring data exchange is efficient and reliable.
                 </li>
                 <li className="list-item px-4">
-                    <strong>Tailwind CSS:</strong> VirgoChat's visually appealing and creative design is achieved through Tailwind CSS, a utility-first CSS framework that promotes rapid styling.
+                    <strong>Tailwind CSS:</strong> VirgoChat&apos;s visually appealing and creative design is achieved through Tailwind CSS, a utility-first CSS framework that promotes rapid styling.
                 </li>
                 <li className="list-item px-4">
                     <strong>Pusher:</strong> Real-time communication is enabled by Pusher, allowing instant message updates and seamless collaboration.
@@ -69,7 +69,7 @@ export default function About() {
                     <strong>Zustand:</strong> Zustand offers minimalistic state management for React applications, guaranteeing smooth user interactions and data synchronization.
                 </li>
                 <li className="list-item px-4">
-                    <strong>TypeScript:</strong> TypeScript enhances code safety and developer productivity, contributing to VirgoChat's robust and maintainable codebase.
+                    <strong>TypeScript:</strong> TypeScript enhances code safety and developer productivity, contributing to VirgoChat&apos;s robust and maintainable codebase.
                 </li>
             </ul>
             <div className="flex flex-col mt-2 h-fit w-full">
@@ -77,7 +77,7 @@ export default function About() {
                     Elevating Communication
                 </h5>
                 <p className="p-3 h-fit w-full">
-                    VirgoChat transforms the way users communicate by amalgamating these technologies into a creative and elegant chat application. Whether it's private conversations, group discussions, or profile customization, VirgoChat bridges the gap between technology and communication, offering a truly exceptional user experience.
+                    VirgoChat transforms the way users communicate by amalgamating these technologies into a creative and elegant chat application. Whether it&apos;s private conversations, group discussions, or profile customization, VirgoChat bridges the gap between technology and communication, offering a truly exceptional user experience.
                 </p>
             </div>
         </div>
