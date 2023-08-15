@@ -84,6 +84,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                 const { data } = await axios.post('/api/decode-session', { sessionValue })
 
                 if (data.data) await handleMessagesData(sessionValue)
+                if (data.data) await handleGroupsMessages(data.data.id)
 
                 setSession(data?.data || null)
             } catch (error) {
@@ -184,7 +185,7 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
 
     useEffect(() => {
         if(session) handleGroupsMessages(session.id)
-    }, [session, groupsData])
+    }, [session, groupsData, messages])
 
     // set session
     const handleSession = async () => await handleUserToken()
