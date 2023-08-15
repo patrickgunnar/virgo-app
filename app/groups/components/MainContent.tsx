@@ -476,20 +476,26 @@ const MainContent = () => {
                     <div className="flex flex-col-reverse justify-start items-start h-[73%] w-full 
                     overflow-hidden overflow-y-auto no-scrollbar">
                         {
-                            currentGroup.messages.map(item => {
-                                const currentUser = currentGroup.membersData.filter(user => (item.senderId === user.userId))[0]
-
-                                return (
-                                    <MessageLayout key={item.id}
-                                        name={currentUser.name}
-                                        username={currentUser.username}
-                                        image={currentUser.image || ''}
-                                        message={item}
-                                        isCurrentUser={session.id === item.senderId}
-                                        bio={currentUser.bio}
-                                    />
-                                )
-                            })
+                            currentGroup.messages.length > 0 ? (
+                                currentGroup.messages.map(item => {
+                                    const currentUser = currentGroup.membersData.filter(user => (item.senderId === user.userId))[0]
+    
+                                    return (
+                                        <MessageLayout key={item.id}
+                                            name={currentUser.name}
+                                            username={currentUser.username}
+                                            image={currentUser.image || ''}
+                                            message={item}
+                                            isCurrentUser={session.id === item.senderId}
+                                            bio={currentUser.bio}
+                                        />
+                                    )
+                                })
+                            ) : (
+                                <div className="flex justify-center items-center h-fit w-full">
+                                    Send first message
+                                </div>
+                            )
                         }
                     </div>
                     <div className="flex gap-2 justify-between items-center mb-2 md:mb-0 h-[15%] w-full lg:w-[50%]">

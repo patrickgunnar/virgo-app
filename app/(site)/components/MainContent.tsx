@@ -276,23 +276,29 @@ const MainContent = () => {
                     <div className="flex flex-col-reverse justify-start items-start h-[82%] w-full 
                     overflow-hidden overflow-y-auto no-scrollbar">
                         {
-                            currentChat.chat.map(item => {
-                                const currentName = session.id === item.senderId ? session.name : currentChat.name
-                                const currentImage = session.id === item.senderId ? session.image : currentChat.image
-                                const currentUsername = session.id === item.senderId ? session.username : currentChat.username
-                                const currentBio = session.id === item.senderId ? session.bio : currentChat.name
-
-                                return (
-                                    <MessageLayout key={item.id}
-                                        name={currentName}
-                                        username={currentUsername}
-                                        image={currentImage}
-                                        message={item}
-                                        isCurrentUser={session.id === item.senderId}
-                                        bio={currentBio}
-                                    />
-                                )
-                            })
+                            currentChat.chat.length > 0 ? (
+                                currentChat.chat.map(item => {
+                                    const currentName = session.id === item.senderId ? session.name : currentChat.name
+                                    const currentImage = session.id === item.senderId ? session.image : currentChat.image
+                                    const currentUsername = session.id === item.senderId ? session.username : currentChat.username
+                                    const currentBio = session.id === item.senderId ? session.bio : currentChat.name
+    
+                                    return (
+                                        <MessageLayout key={item.id}
+                                            name={currentName}
+                                            username={currentUsername}
+                                            image={currentImage}
+                                            message={item}
+                                            isCurrentUser={session.id === item.senderId}
+                                            bio={currentBio}
+                                        />
+                                    )
+                                })
+                            ) : (
+                                <div className="flex justify-center items-center h-fit w-full">
+                                    Send first message
+                                </div>
+                            )
                         }
                     </div>
                     <div className="flex gap-2 justify-between items-center mb-2 md:mb-0 h-[15%] w-full lg:w-[50%]">
