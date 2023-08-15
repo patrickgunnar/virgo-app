@@ -4,7 +4,7 @@ export interface UserType {
     email: string
     emailVerified?: Date
     image: string
-    groupId: string[]
+    groups: string[]
     username: string
     bio: string
     tokenVirgo: string
@@ -16,6 +16,7 @@ export interface MessageType {
     receiverId: string
     message: string
     created_at: string
+    groupId: string
 }
 
 export interface ChatType {
