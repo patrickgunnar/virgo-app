@@ -59,6 +59,7 @@ async function fetchGroupData(groupMembership: GroupMembership): Promise<GroupRe
                     image: true,
                     username: true,
                     bio: true,
+                    id: true
                 },
             },
         },
@@ -69,6 +70,7 @@ async function fetchGroupData(groupMembership: GroupMembership): Promise<GroupRe
         image: user.image || '',
         username: user.username,
         bio: user.bio,
+        userId: user.id,
         groupMembershipId: groupMembership.id,
     }))
 
