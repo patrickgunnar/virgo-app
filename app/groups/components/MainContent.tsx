@@ -83,6 +83,13 @@ const MainContent = () => {
         setValue('addingNewMessage', '')
     }
 
+    // close modal
+    const handleModalClose = () => {
+        onClose()
+        // reset form
+        reset()
+    }
+
     // submit handler
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
         try {
@@ -158,6 +165,8 @@ const MainContent = () => {
                             toast.success('Group created successfully!')
                             // reset message
                             resetMessage()
+                            // close modal
+                            handleModalClose()
                         }
                     }).catch((error) => {
                         // display error msg
@@ -181,7 +190,7 @@ const MainContent = () => {
                 setLoading(true)
 
                 // check data
-                if (data.addingNewUser && session && currentDisplayGroupId) {
+                if (data.addingNewUser && session && currentDisplayGroupId && isUsername) {
                     const currentData = {
                         token: session.tokenVirgo,
                         username: data.addingNewUser,
@@ -197,6 +206,8 @@ const MainContent = () => {
                             toast.success('User added successfully!')
                             // reset message
                             resetMessage()
+                            // close modal
+                            handleModalClose()
                         }
                     }).catch((error) => {
                         // display error msg
@@ -205,7 +216,7 @@ const MainContent = () => {
                 } else {
                     setLoading(false)
                     // display error msg
-                    toast.error('Please, enter the new username!')
+                    toast.error('Please, enter a valid username!')
                 }
             } catch (error) {
                 setLoading(false)
@@ -229,13 +240,6 @@ const MainContent = () => {
 
         // trigger submit handler
         handleSubmit(onNewGroupSubmit)()
-    }
-
-    // close modal
-    const handleModalClose = () => {
-        onClose()
-        // reset form
-        reset()
     }
 
     // back button handler
