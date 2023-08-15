@@ -8,7 +8,7 @@ import useModal from "@/hooks/useModal";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { useSession } from "@/providers/SessionProvider";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BsFillSendFill, BsPlusCircleFill } from "react-icons/bs";
 import { MdGroupWork } from "react-icons/md";
 import axios from "axios";
@@ -41,6 +41,11 @@ const MainContent = () => {
     const [loading, setLoading] = useState<boolean>(false)
     // username state
     const [isUsername, setIsUsername] = useState<boolean>(false)
+    // model content
+    const [isGroup, setIsGroup] = useState<boolean | null>(null)
+
+    // interval ref
+    const timeoutRef = useRef<NodeJS.Timer>()
 
     // use form hook
     const {
@@ -204,7 +209,7 @@ const MainContent = () => {
     const handleModalClose = () => {
         onClose()
         // reset form
-        reset()
+        setValue('addingNewUser', '')
     }
 
     // back button handler
@@ -227,6 +232,59 @@ const MainContent = () => {
         }
     }
 
+    // new group modal layout handler
+    const handleNewGroupModalLayout = () => {
+        // set modal content
+        setIsGroup(true)
+        // open modal
+        onOpen()
+    }
+
+    // new user to group modal layout handler
+    const handleNewUserGroupModalLayout = () => {
+        // set modal content
+        setIsGroup(false)
+
+        // open modal
+        onOpen()
+    }
+
+    const handleUsernameTimeout = useCallback(() => {
+        setLoading(true)
+
+        // if there's an interval, clears it
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+
+        timeoutRef.current = setTimeout(() => {
+            // check if username exists
+            axios.post('/api/get-username', { usernameData: addingNewUser }).then((response) => {
+                // get the available username label
+                const usernameLabel = document.getElementById('existingUsernameLabel')
+
+                // if label, set msg
+                if (usernameLabel) {
+                    usernameLabel.innerText = response.data.exists ? (
+                        `Add @${addingNewUser}! to group`
+                    ) : (
+                        "Username does not exist!"
+                    )
+
+                    setIsUsername(response.data.exists ? true : false)
+                }
+
+                if(usernameLabel && session?.username === addingNewUser) {
+                    usernameLabel.innerText = "Please, choose a unique username that is different from your own!"
+                    setIsUsername(false)
+                }
+            }).finally(() => setLoading(false))
+        }, 1000)
+    }, [addingNewUser])
+
+    useEffect(() => {
+        // set interval
+        if (addingNewUser.length > 0) handleUsernameTimeout()
+    }, [addingNewUser, handleUsernameTimeout])
+
     // button handler
     const CurrentButton = ({ eventFn, children, type }: ButtonType) => (
         <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
@@ -243,7 +301,7 @@ const MainContent = () => {
     let currentLayout = (
         <>
             <div className="flex flex-col justify-center items-center my-2 mb-4 h-fit w-[40%] md:w-[20%]">
-                <CurrentButton type="button" eventFn={() => onOpen()}>
+                <CurrentButton type="button" eventFn={handleNewGroupModalLayout}>
                     <BsPlusCircleFill size={25} />
                 </CurrentButton>
             </div>
@@ -316,7 +374,7 @@ const MainContent = () => {
                             </div>
                         </div>
                         <div className="flex justify-center items-center px-6 h-full w-full md:w-fit">
-                            <CurrentButton type="button" eventFn={() => {}}>
+                            <CurrentButton type="button" eventFn={handleNewUserGroupModalLayout}>
                                 Add User
                             </CurrentButton>
                         </div>
@@ -382,38 +440,80 @@ const MainContent = () => {
                 <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[40%] rounded-md
                 from-[#c77d29] via-[#c66f22] to-[#ae5817] bg-gradient-to-b border-[#c66f22]
                 border-[1px] drop-shadow-[0_0_0.5rem] shadow-[rgba(0,0,0,0.57)] overflow-hidden my-2">
-                    <label className="relative truncate text-center text-base font-bold h-fit w-full">
-                        Group
-                    </label>
-                    <div className="flex h-fit w-[90%]">
-                        <Input id="addingNewGroup"
-                            label="Please, provide the group name:"
-                            placeholder="Add the name of the group"
-                            type="text"
-                            register={register}
-                            errors={errors}
-                            disabled={false}
-                            value={addingNewGroup}
-                            required
-                        />
-                    </div>
-                    <div className="flex justify-between items-center h-fit w-[80%]">
-                        <div className="flex justify-center items-center h-fit w-[40%]">
-                            <CurrentButton type="button" eventFn={() => handleModalClose()}>
-                                Cancel
-                            </CurrentButton>
-                        </div>
-                        <div className="flex justify-center items-center h-fit w-[40%]">
-                            <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
-                            from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
-                            shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
-                                type="submit" onClick={handleSubmit(onNewGroupSubmit)}>
-                                {
-                                    !loading ? 'Add' : <Loading />
-                                }
-                            </Button>
-                        </div>
-                    </div>
+                    {
+                        isGroup ? (
+                            <>
+                                <label className="relative truncate text-center text-base font-bold h-fit w-full">
+                                    Group
+                                </label>
+                                <div className="flex h-fit w-[90%]">
+                                    <Input id="addingNewGroup"
+                                        label="Please, provide the group name:"
+                                        placeholder="Add the name of the group"
+                                        type="text"
+                                        register={register}
+                                        errors={errors}
+                                        disabled={false}
+                                        value={addingNewGroup}
+                                        required
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center h-fit w-[80%]">
+                                    <div className="flex justify-center items-center h-fit w-[40%]">
+                                        <CurrentButton type="button" eventFn={() => handleModalClose()}>
+                                            Cancel
+                                        </CurrentButton>
+                                    </div>
+                                    <div className="flex justify-center items-center h-fit w-[40%]">
+                                        <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
+                                        from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
+                                        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
+                                            type="submit" onClick={handleSubmit(onNewGroupSubmit)}>
+                                            {
+                                                !loading ? 'Add' : <Loading />
+                                            }
+                                        </Button>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <label className="relative truncate text-center text-base font-bold h-fit w-full">
+                                    Contact
+                                </label>
+                                <div className="flex h-fit w-[90%]">
+                                    <Input id="addingNewUser"
+                                        label="Please, provide the username you wish to contact:"
+                                        placeholder="Add new user to your contact"
+                                        labelId="existingUsernameLabel"
+                                        type="text"
+                                        register={register}
+                                        errors={errors}
+                                        disabled={false}
+                                        value={addingNewUser}
+                                        required
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center h-fit w-[80%]">
+                                    <div className="flex justify-center items-center h-fit w-[40%]">
+                                        <CurrentButton type="button" eventFn={() => handleModalClose()}>
+                                            Cancel
+                                        </CurrentButton>
+                                    </div>
+                                    <div className="flex justify-center items-center h-fit w-[40%]">
+                                        <Button className="flex justify-center items-center rounded-md font-bold text-base py-2 px-8
+                                        from-[#f1e499] via-[#b1ba27] to-[#888c08] bg-gradient-to-b drop-shadow-[0_1.4px_0.05rem] 
+                                        shadow-[#00000092] border-[#b1ba27] border-[1px] hover:opacity-75" disabled={loading}
+                                            type="button" onClick={handleNewMessage}>
+                                            {
+                                                !loading ? 'Add' : <Loading />
+                                            }
+                                        </Button>
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    }
                 </div>
             </Modal>
         </div>
