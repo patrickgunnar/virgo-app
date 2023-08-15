@@ -22,7 +22,7 @@ const pusher = new Pusher({
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { token, message, username } = body
+        const { token, message, username, groupId = null } = body
 
         if (
             !token || typeof token !== "string" ||
@@ -54,13 +54,14 @@ export async function POST(request: Request) {
                 }
             })
 
+
             if (sender && sender.tokenVirgo === token && receiver) {
                 const newMessage = await prisma.message.create({
                     data: {
                         message: message,
                         senderId: sender.id,
                         receiverId: receiver.id,
-                        groupId: sender.id
+                        groupId: groupId ? groupId : sender.id
                     }
                 })
 
