@@ -134,7 +134,11 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                     // Listen for the "new-message" event
                     channel.bind('new-message', (data: MessageType) => {
                         // Check if the message involves the current user
-                        if (data.receiverId === session.id || data.senderId === session.id) {
+                        if (
+                            data.receiverId === session.id || 
+                            data.senderId === session.id ||
+                            session.groups.includes(data.groupId)
+                        ) {
                             // Add the new message to the messages state
                             setMessages(prevMessages => [ data, ...prevMessages ])
                         }
@@ -177,15 +181,12 @@ export const SessionContextProvider: React.FC<SessionContextProviderProps> = ({ 
                 const chats = await getChats(session.id, messages)
 
                 setChats(chats)
+                await handleGroupsMessages(session.id)
             }
         }
 
         handleChatFilter()
-    }, [session, messages])
-
-    useEffect(() => {
-        if(session) handleGroupsMessages(session.id)
-    }, [session, groupsData, messages])
+    }, [session, messages, groupsData])
 
     // set session
     const handleSession = async () => await handleUserToken()
