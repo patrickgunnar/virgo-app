@@ -12,7 +12,7 @@ export const isValidEmail = (email: string): boolean => {
 export const removeSpecialChar = (data: string) => {
     const regex = /[^a-zA-Z0-9]/g
 
-    return data.replace(regex, '')
+    return data.replace(regex, '').toLowerCase()
 }
 
 // hash password
