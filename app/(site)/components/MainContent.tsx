@@ -333,7 +333,7 @@ const MainContent = () => {
         self-start overflow-hidden overflow-y-auto">
             {currentLayout}
             <Modal open={open} onChange={handleModalClose}>
-                <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[40%] rounded-md
+                <div className="flex flex-col gap-6 justify-start items-center py-8 h-fit w-[98%] md:w-[40%] rounded-md
                 from-[#c77d29] via-[#c66f22] to-[#ae5817] bg-gradient-to-b border-[#c66f22]
                 border-[1px] drop-shadow-[0_0_0.5rem] shadow-[rgba(0,0,0,0.57)] overflow-hidden my-2">
                     <label className="relative truncate text-center text-base font-bold h-fit w-full">
