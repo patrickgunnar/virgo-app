@@ -15,7 +15,7 @@ interface GroupMembership {
     groupId: string
 }
 
-interface Message { 
+interface Message {
     id: string
     senderId: string
     receiverId: string
@@ -24,7 +24,7 @@ interface Message {
     groupId: string
 }
 
-interface Group { 
+interface Group {
     id: string
     name: string
 }
@@ -40,6 +40,9 @@ async function fetchGroupData(groupMembership: GroupMembership): Promise<GroupRe
         where: {
             groupId: groupMembership.groupId,
         },
+        orderBy: {
+            created_at: 'desc'
+        }
     })
 
     const groupData = await prisma.group.findUnique({
